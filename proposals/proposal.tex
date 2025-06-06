@@ -1,0 +1,58 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage[margin=3.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{iftex}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp} % provide euro and other symbols
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{listings}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\usepackage{bookmark}
+\usepackage[
+backend=biber,
+style=alphabetic
+]{biblatex}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Masters Thesis Proposal/Prereading}
+\author{Skye Purchase}
+\date{6 June 2025}
+
+\addbibresource{references.bib}
+\begin{document}
+
+\maketitle
+
+The primary goal of the project is to develop a better understanding of the failure cases of steering.
+Specifically why these cases fail and whether that is intrinsic or if it is possible to steer these concepts.
+The nexus for this idea comes from the research directions in \cite{steering-taxonomy}. \\
+
+\textbf{Core project.}
+I agree with the hypothesis in \cite{steering-taxonomy} that spurious correlations are likely a reason for the failure cases.
+The idea being that certain concepts are unsteerable \cite{steerability} because the positive-negative pairs contain correlations unrelated to the desired concept.
+In larger datasets it will be possible to analyse spurious correlations by using SAEs as per \cite{dataset_debugging_with_SAEs}.
+This analysis will, likely, either demonstrate that high-quality vetted datasets are required to produce effective steering vectors or that there is some underlying issue with certain concepts that breaks the assumptions made by modern steering approaches.
+In the later case the ideal scenario is being able to identify which concepts are unsteerable for a given model or model agnostically.
+
+I also propose that interactions between layers localised around the most active layer play a part in unsteerable concepts. The hypothesis is that (especially in the single layer case) linear steering approaches cause significant changes that break correlations across layers that are important to certain concepts. This hypothesis is based on the ablation studies in \cite{steerability} as well as \cite{conceptors}, \cite{function-vectors}, and \cite{steering-theory} that show fairly equally active layers surrounding the most active layer. \\
+
+\textbf{Next Step.}
+Setup LoReFT \cite{reft}, LoReST \cite{steering-theory}, CAA \cite{caa}, and ACE \cite{ACE} in a toy environment to verify performance.
+The toy setup chosen will be similar to that by \cite{steering-theory} to reproduce the results for the low-rank methods and extend to the new methods.
+The toy setup will allow manipulation of the activations that are being used to steer.
+This will provide an easy way to induce spurious correlations during positive-negative pair data collection and within the model itself.
+Insights from this stage can be used to suggest avenues to explore moving to larger LMs and real world data.
+
+\printbibliography
+
+\end{document}
