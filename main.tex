@@ -1,0 +1,59 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=20mm]{geometry}
+\usepackage[pdfborder={0 0 0},backref=page]{hyperref}
+\usepackage{dissertation}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=red,
+    citecolor=red
+}
+
+\bibliographystyle{plain}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\Tr}{Tr}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{{ \includegraphics[scale=.5]{figures/ucl_logo.png}}\\
+{{\Huge Reliability of Low-Rank Adapters}}\\
+{\large A working title}\\
+}
+\date{Submission date: 8 September 2025}
+\author{Skye Purchase\thanks{
+{\bf Disclaimer:}
+This report is submitted as part requirement for the Machine Learning MSc at UCL. It is
+substantially the result of my own work except where explicitly indicated in the text.
+The report may be freely copied and distributed provided the source is explicitly acknowledged}
+\\ \\
+Machine Learning MSc\\ \\
+Daniel Tan \& Brooke's Paige}
+
+\begin{document}
+
+\include{math_commands}
+\include{metadata}
+
+\pagenumbering{roman}
+
+\onehalfspacing
+\maketitle
+\begin{abstract}
+Summarise your report concisely.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\bibliography{references}
+
+\appendix
+
+\end{document}
