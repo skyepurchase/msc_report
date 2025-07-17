@@ -11,7 +11,7 @@
     citecolor=red
 }
 
-\bibliographystyle{plain}
+\bibliographystyle{unsrtnat}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -22,8 +22,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title{{ \includegraphics[scale=.5]{figures/ucl_logo.png}}\\
-{{\Huge Reliability of Low-Rank Adapters}}\\
-{\large A working title}\\
+{{\Huge Why Steering Vectors Fail}}\\
 }
 \date{Submission date: 8 September 2025}
 \author{Skye Purchase\thanks{
@@ -51,6 +50,12 @@ Summarise your report concisely.
 \tableofcontents
 \clearpage
 \pagenumbering{arabic}
+
+\include{chapters/introduction}
+\include{chapters/background}
+\include{chapters/methodology}
+\include{chapters/results}
+\include{chapters/conclusion}
 
 \bibliography{references}
 
