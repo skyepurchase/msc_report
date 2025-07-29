@@ -1,6 +1,21 @@
 \chapter{Background}
 
-\section{Notation}
+\section{Notation and Concepts}
+
+Model ``behaviours", in general, are patterns in how the model responds to input.
+This includes the desired behaviour it was trained on (such as classifying images of cats and dogs) but includes patterns in the output that were not explicitly trained for.
+Desired model behaviour is considered ``positive" and undesired model behaviour is considered ``negative".
+Specifically, an example of the desired behaviour is considered a ``positive example'' and an example of undesired or neutral behaviour is considered a ``negative'' example.
+An example of a behaviour generally includes an input-output pairing similar to training examples however they are more specific pairings than would be using during training.
+
+Vectors are represented by boldface letters, $\vx, \vy, \vz$, scalars are represented by greek letters, $\alpha, \beta, \gamma$, and matrices are represented by boldface capital letters, $\mA, \mB, \mC$.
+Some matrices may represent transformations or collections of feature vectors, context should disambiguate the two.
+In general vectors are column vectors, $\vx = \begin{bmatrix*}
+    1 & 2 & \cdots & n
+\end{bmatrix*}^T$ except when a collection of vectors is represented in matrix form, in this case each row is a vector.
+
+In a multi-layer machine learning model the output of an internal layer is an ``activation'' denoted $\va$.
+A positive activation is denoted $\va^+$ and a negative activation is denoted as $\va^-$. Here, ``positive activation'' means the activation extracted from the model given a positive example as above.
 
 \section{Model Alignment}
 
