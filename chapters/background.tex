@@ -161,6 +161,54 @@ In this way the adaptor is able to perform consistently across different data re
 
 \section{Large Language Models}
 
+Steering and model alignment in general is not confined to large language models (LLM)s however these are currently the most widespread model in use.
+LLMs aim to immitate, complete, or analyse natural language and are characterised by incredibly large numbers of parameters.
+Some are as large as 1.76 trillion \cite{gpt4-count} and even small models have as many as 1 billion \cite{gemma}.
+
+Only generative LLMs are discussed in this project.
+These are models which are not trained to classify or fit a dataset in the classical sense but instead to produce more data as if it were sampled from the underlying training distribution.
+In the case of LLMs this means producing coherent natural language.
+
+The underlying technology behind modern generative LLMs is the transformer \cite{transformers} and their many derivatives \cite{linear-attention, bigbird, linformer}.
+
 \subsection{Transformers}
+
+Transformers \cite{transformers} are now a mainstay of modern deep learning.
+They utilise the attention mechanism to dynamically transform (sequential) input based on the surrounding context.
+
+This section does not aim to describe transformers in full detail but provide enough background for the rest of the project.
+Keywords are provided for further reading and the explanation is based on the paper by \citet{turner2023}.
+
+Attention can be considered as a learnable lookup table with queries, keys and values.
+If a query and a key are similar then the corresponding value should be returned.
+This can be represented as a dot-product between a matrix of queries $\mQ$ and keys $\mK$.
+These are normalised to act as probabilities that a specific value is the target value.
+Given a matrix of values $\mV$ attentio is represented by the following equation
+\begin{equation*}
+    \text{softmax}(\frac{\mQ\mK^T}{\sqrt{d_k}})\mV.
+\end{equation*}
+The trick is to have $\mQ$, $\mK$ and $\mV$ all depend on the input features, this is known as ``self-attention''.
+In this way $\mV$ behaves like a standard weight transformation and the softmax of $\mQ$ and $\mK$ behave like a dynamic weight transformation dependent on the input.
+This allows a model to ``attend" to different parts of the input by adjusting the transformation matrices that make $\mQ, \mK$ and $\mV$.
+
+Modern transformers contain attention blocks each containing multiple ``attention heads'' that use the above mechanism.
+This allows the model to respond dynamically to a large range of inputs.
+After this attention block a standard multi-layer perceptron (MLP) is added.
+This constitutes the transformer block and is visualised in \ref{}.
+
+The ability for transformers to utilise context in surrounding input values makes them particularly suited to natural language processing (NLP).
+The meaning of words in a sentence depend on the words that surround it.
+Furthermore, the words depend on each other in different ways depending on the context.
+This is precisely how transformer attention blocks work allowing them to parse natural language far better than previous attempts.
+
+For transformers to work on natural language the input needs to be tokenized into descrete chunks, frequently based on words.
+These chunks can then be converted to unique numbers and later represented as input features.
+To aid the model, the position of the token within the sentence is also encoded this is known as ``positional encoding''.
+This allows the model to distinguish between the two instances of ``can'' in the sentence ``can you pass me the can''.
+
+It is important to note that when training a model to generate natural language it must be trained without access to future tokens.
+The process of hiding future tokens at a given token is called ``attention masking'' and is only applied in the attention blocks.
+
+\subsection{Instruction Tuning}
 
 \section{Sparse Auto-Encoders}
