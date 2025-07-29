@@ -7,6 +7,7 @@
 \section{Model Intervention}
 
 \subsection{Contrastive Activation Addition}
+\label{caa}
 
 An intuitative approach to model intervention is to perturb the model's activations in a desired direction.
 By calculating a linear direction in activation space from undesired activations towards desired ones this vector can simply be added to all activations in the model during inference.
@@ -14,9 +15,9 @@ The hope is that the model produces output that matches the desired behaviour wh
 
 \textcolor{red}{Add a figure demonstrating this!}
 
-In the simplest form consider two example inputs with desired and undesired behaviour\footnote{assuming some level of similarity between the examples}.
+In the simplest form consider two example inputs with desired and undesired behaviour.
 Their difference gives a direction in feature space that corresponds to shifting the models output from undesired behaviour towards desired behaviour.
-This is the approach proposed by \citet{activation-addition}, however, it is not robust and relies heavily on the example inputs.
+This is the approach proposed by \citet{activation-addition}, however, it is not robust and relies heavily on the example inputs \cite{caa}.
 
 To improve on this approach \citet{caa} suggest using a collection of examples and calculating their mean difference in activation space.
 This requires the notion of \textit{contrastive pairs}, two inputs that are similar in all ways except for the behaviour that is being changed.
@@ -26,18 +27,60 @@ Formally, given a set of positive example activations $(\va_i^+)_{i\le n}$ and n
 \[\vv_{steer} = \frac{1}{n}\sum_{i=1}^{n}\va_i^+ - \va_i^-.\]
 
 Given a steering vector, $\vv_{steer}$, and a model activation during inference, $\va$, the resulting steered activation is
-\[\va_{steered} = \va + \lambda\vv_{steer}\]
+\begin{equation}
+    \label{eq:caa}
+    \va_{steered} = \va + \lambda\vv_{steer}
+\end{equation}
 where $\lambda$ is a user-defined parameter controlling the strength of the steering intervention.
 The model activation is replaced by the steered activation during inference resulting in the model producing an output aligned with the positive examples.
 
 This approach has a few drawbacks \cite{steerability, ACE, non-linear-features} due to its assumptions.
-This approach assumes that the zero-vector in activation space has the inherent meaning of no-behaviour which \citet{ACE} dispute.
+Primarily this approach does not consider how much of a behaviour is already present.
+This means the steering parameter does not fully determine the strength of the desired behaviour.
 Furthermore, \citet{steerability} demonstrate that this approach is not robust across behaviours that may be steered along.
 The approach assumes that concepts in activation space are linear which \citet{non-linear-features} show is not universal.
-Techniques such as affine concept editting (ACE) \ref{ace} use an affine approach to overcome these drawbacks.
+Techniques such as affine concept editting (ACE) \Sref{ace} use an affine approach to overcome these drawbacks.
 
 \subsection{Affine Concept Editting}
 \label{ace}
+
+\citet{ACE} claim that CAA \Sref{caa} is not sufficiently general as it does not consider how much the desired behaviour is already present.
+To see this consider an arbitrary activation vector $\va$ and steering direction $\vr$ encoding some behaviour.
+$\va$ can be decomposed as the perpendicular and parallel components of $\vr$
+\begin{align*}
+    \va &= \text{proj}_\vr^{\perp}(\va) + \text{proj}_\vr^{\parallel}(\va) \\
+        &= \text{proj}_\vr^{\perp}(\va) + \alpha\vr.
+\end{align*}
+Adding $\lambda\vr$ as per \Eref{eq:caa} will be inconsistent as $\alpha + \lambda$ will not be equivalent across all (negative) activations.
+This shows that CAA does not account for how much a behaviour may already be present in an activation.
+
+Furthemore, it is not (generally) the case that $\mathbf{0}$ represents lack of behaviour.
+Instead there is some vector $\va_0$ that represents the lack of the target behaviour.
+The above equation can incorporate this idea as follows
+\begin{align*}
+    \va &= \va_0 + \Delta\va \\
+        &= \va_0 + \text{proj}_\vr^{\perp}(\Delta\va) + \text{proj}_\vr^{\parallel}(\Delta\va) \\
+        &= \va_0 + \text{proj}_\vr^{\perp}(\Delta\va) + \alpha^\prime\vr.
+\end{align*}
+
+Removing the behaviour by setting $\alpha^\prime = 0$ yields
+\begin{align*}
+    \va^\prime &= \va_0 + \text{proj}_\vr^{\perp}(\Delta\va) \\
+               &= \va - \text{proj}_\vr^{\parallel}(\Delta\va) \\
+               &= \va - \text{proj}_\vr^{\parallel}(\va) + \text{proj}_\vr^{\parallel}(\va_0) \\
+               &= \va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr.\footnotemark[1]
+\end{align*}
+\footnotetext[1]{As $\va_0$ exists as a reference point along the steered direction.}
+This represents the activation lacking the target behaviour but retaining other relevant context.
+The behaviour can be reintroduced at any relevant strength resulting in
+\begin{equation}
+    \label{eq:ace}
+    \va_\text{steered} = \va_0 - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
+\end{equation}
+From \Sref{caa} the reference point, $\va_0$, is represented by the mean of the negative examples, $\frac{1}{n}\sum_{i=1}^{n}\va_i^-$.
+
+This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
+This is therefore affine and hence the name \textit{affine concept editting} (ACE).
 
 \subsection{Low-rank Representation Finetuning}
 \label{loreft}
