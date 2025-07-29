@@ -34,7 +34,7 @@ Given a steering vector, $\vv_{steer}$, and a model activation during inference,
 where $\lambda$ is a user-defined parameter controlling the strength of the steering intervention.
 The model activation is replaced by the steered activation during inference resulting in the model producing an output aligned with the positive examples.
 
-This approach has a few drawbacks \cite{steerability, ACE, non-linear-features} due to its assumptions.
+This approach has a few drawbacks \cite{steerability, ace, non-linear-features} due to its assumptions.
 Primarily this approach does not consider how much of a behaviour is already present.
 This means the steering parameter does not fully determine the strength of the desired behaviour.
 Furthermore, \citet{steerability} demonstrate that this approach is not robust across behaviours that may be steered along.
@@ -44,7 +44,7 @@ Techniques such as affine concept editting (ACE) \Sref{ace} use an affine approa
 \subsection{Affine Concept Editting}
 \label{ace}
 
-\citet{ACE} claim that CAA \Sref{caa} is not sufficiently general as it does not consider how much the desired behaviour is already present.
+\citet{ace} claim that CAA \cite{caa} is not sufficiently general as it does not consider how much the desired behaviour is already present.
 To see this consider an arbitrary activation vector $\va$ and steering direction $\vr$ encoding some behaviour.
 $\va$ can be decomposed as the perpendicular and parallel components of $\vr$
 \begin{align*}
@@ -52,7 +52,7 @@ $\va$ can be decomposed as the perpendicular and parallel components of $\vr$
         &= \text{proj}_\vr^{\perp}(\va) + \alpha\vr.
 \end{align*}
 Adding $\lambda\vr$ as per \Eref{eq:caa} will be inconsistent as $\alpha + \lambda$ will not be equivalent across all (negative) activations.
-This shows that CAA does not account for how much a behaviour may already be present in an activation.
+This shows that CAA \cite{caa} does not account for how much a behaviour may already be present in an activation.
 
 Furthemore, it is not (generally) the case that $\mathbf{0}$ represents lack of behaviour.
 Instead there is some vector $\va_0$ that represents the lack of the target behaviour.
@@ -80,13 +80,69 @@ The behaviour can be reintroduced at any relevant strength resulting in
 From \Sref{caa} the reference point, $\va_0$, is represented by the mean of the negative examples, $\frac{1}{n}\sum_{i=1}^{n}\va_i^-$.
 
 This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
-This is therefore affine and hence the name \textit{affine concept editting} (ACE).
+This is therefore affine and hence the name \textit{affine concept editting} (ACE) \cite{ace}.
 
 \subsection{Low-rank Representation Finetuning}
 \label{loreft}
 
+Both CAA \cite{caa} and ACE \cite{ace} edit the activations in their full rank form and rely on addition (whether affine or linear).
+This limits the transforms the approaches can apply to the activation space.
+If the desired behaviour requires rotations or scaling of the activations these methods fail.
+However, perform affine transformations to the full rank activation is costly as the dimension of the activations may be large.
+
+\citet{reft} present a low-rank steering adaptor inspired by parameter-efficient finetuning methods such as LoRA \cite{lora}, DoRA \cite{dora} and adaptor-based methods \cite{petl}.
+Unlike steering these approaches aim to finetune a model using reduced parameter counts compared to the original model.
+Rather than finetuning a model this approach aims to edit the representations of the model, this is equivalent to steering.
+
+The key insight is to steer the activations in a low-rank space.
+The specific approach is based on the distributed interchange intervention\footnote{This tests whether a concept is encoded in some subspace. When working with low-rank editting this is exactly the assumption we use.} \cite{dii} with the following form
+\begin{equation*}
+    DII(\vx,\vy,\mR) = \vx + \mR^T(\mR\vy - \mR\vx)
+\end{equation*}
+where $\mR \in \mathbb{R}^{r\times d}$ is a low-rank projection matrix.
+
+\citet{reft} suggest replacing $\mR\vy$ with an affine transformation $\mW\vx + \vb$.
+Thus, the adaptor learns a transformation, $\mR\va^+ = \mW\va^- + \vb$, from negative activations to positive low-rank representations.
+In this way the adaptor can learn low-rank representations of activations that encapsulate the desired behaviour and adjust the activations in a parameter efficient space.
+The approach is therefore a \textit{low-rank representation finetuning} (LoReFT) adaptor.
+The full adaptor is
+\begin{equation}
+    \label{eq:loreft}
+    \va_\text{steered} = \va + \mR^T(\mW\va + \vb - \mR\va).
+\end{equation}
+The learnable parameters of the adaptor are $\phi = \{\mW, \mR, \vb\}$.
+$\mR$ is constrained to be an orthogonal projection matrix achieved by differentiable QR decomposition.
+
+Unlike CAA \cite{caa} and ACE \cite{ace} this approach requires paired datapoints as the adaptor needs to learn a transformation from negative examples to positive examples.
+This drawback means that in the low data regime this approach is less effective than the other two approaches.
+However, with sufficient data, this method is able to outperform CAA and ACE as it can utilise more complex transformations between negative and positive behaviour.
+The poor performance in low data regimes is improved on by \citet{steering-clear} with their low-rank representation steering adaptor.
+
 \subsection{Low-rank Representation Steering}
 \label{lorest}
+
+\citet{steering-clear} suggest modifying LoReFT \cite{reft} to dynamically drop low-rank dimensions and bring the learnable bias term outside of the low-rank space.
+This allows the model to perform well in the low data regime by relying on linear methods similar to CAA \cite{caa} but keep the benefits of LoReFT.
+By dynamically dropping dimensions the adaptor has more freedom to optimise the rank of the projection.
+
+\citet{steering-clear} define an orthogonal projection
+\begin{align*}
+    \mP = \mI - \mQ\text{diag}(\vp)\mQ^T & \vp_i = \text{GumbelSoftmax}([\vl_i,0];\tau)
+\end{align*}
+where $\mQ \in \mathbb{R}^{r\times d}$ is a learnable low-rank projection matrix, $\vl$ is a learnable Gumbel Softmax distribution probabilities, and $\tau$ is the temperature.
+As with LoReFT, $\mQ$ is an orthogonal projection achieved by differentiable QR decomposition.
+In comparison to LoReFT \Eref{eq:loreft} there is no representation editting in the low-rank space.
+Instead the projection acts as a method to ``zero'' the activation similar to ACE \cite{ace}.
+
+The full adaptor is
+\begin{equation}
+    \va_\text{steered} = \va - (\va\mQ)\text{diag}(\vp)\mQ^T + \vb.
+\end{equation}
+This approach also requires paired data to train the parameters, $\phi = \{\mQ, \vl, \vb\}$.
+
+In the low data regime the adaptor can learn to drop more dimensions and rely on $\vb$ similar to CAA \cite{caa} and ACE \cite{ace}.
+As more data is available the adaptor can rely more on the low-rank projection similar to LoReFT \cite{reft}.
+In this way the adaptor is able to perform consistently across different data regimes.
 
 \section{Large Language Models}
 
