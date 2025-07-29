@@ -142,7 +142,7 @@ By dynamically dropping dimensions the adaptor has more freedom to optimise the 
 
 \citet{steering-clear} define an orthogonal projection
 \begin{align*}
-    \mP = \mI - \mQ\text{diag}(\vp)\mQ^T & \vp_i = \text{GumbelSoftmax}([\vl_i,0];\tau)
+    \mP = \mI - \mQ\text{diag}(\vp)\mQ^T && \vp_i = \text{GumbelSoftmax}([\vl_i,0];\tau)
 \end{align*}
 where $\mQ \in \mathbb{R}^{r\times d}$ is a learnable low-rank projection matrix, $\vl$ is a learnable Gumbel Softmax distribution probabilities, and $\tau$ is the temperature.
 As with LoReFT, $\mQ$ is an orthogonal projection achieved by differentiable QR decomposition.
@@ -185,7 +185,7 @@ This can be represented as a dot-product between a matrix of queries $\mQ$ and k
 These are normalised to act as probabilities that a specific value is the target value.
 Given a matrix of values $\mV$ attentio is represented by the following equation
 \begin{equation*}
-    \text{softmax}(\frac{\mQ\mK^T}{\sqrt{d_k}})\mV.
+    \text{softmax}\left(\frac{\mQ\mK^T}{\sqrt{d_k}}\right)\mV.
 \end{equation*}
 The trick is to have $\mQ$, $\mK$ and $\mV$ all depend on the input features, this is known as ``self-attention''.
 In this way $\mV$ behaves like a standard weight transformation and the softmax of $\mQ$ and $\mK$ behave like a dynamic weight transformation dependent on the input.
