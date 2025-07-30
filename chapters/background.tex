@@ -39,7 +39,7 @@ This requires the notion of \textit{contrastive pairs}, two inputs that are simi
 Hence, this approach is known as \textit{contrastive activation addition} (CAA).
 
 Formally, given a set of positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ a \textit{steering vector} for this behaviour is
-\[\vv_{steer} = \frac{1}{n}\sum_{i=1}^{n}\va_i^+ - \va_i^-.\]
+\[\vv_{steer} = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).\]
 
 Given a steering vector, $\vv_{steer}$, and a model activation during inference, $\va$, the resulting steered activation is
 \begin{equation}
@@ -85,14 +85,17 @@ Removing the behaviour by setting $\alpha^\prime = 0$ yields
                &= \va - \text{proj}_\vr^{\parallel}(\va) + \text{proj}_\vr^{\parallel}(\va_0) \\
                &= \va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr.\footnotemark[1]
 \end{align*}
-\footnotetext[1]{As $\va_0$ exists as a reference point along the steered direction.}
 This represents the activation lacking the target behaviour but retaining other relevant context.
+\footnotetext[1]{As $\va_0$ exists as a reference point along the steered direction.}
 The behaviour can be reintroduced at any relevant strength resulting in
 \begin{equation}
     \label{eq:ace}
     \va_\text{steered} = \va_0 - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
 \end{equation}
-From \Sref{caa} the reference point, $\va_0$, is represented by the mean of the negative examples, $\frac{1}{n}\sum_{i=1}^{n}\va_i^-$.
+Given positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ the reference point and steering direction are
+\begin{align*}
+    \va_0 = \frac{1}{n}\sum_{i=1}^{n}\va_i^- && \vr = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).
+\end{align*}
 
 This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
 This is therefore affine and hence the name \textit{affine concept editting} (ACE) \cite{ace}.
@@ -128,6 +131,9 @@ The full adaptor is
 The learnable parameters of the adaptor are $\phi = \{\mW, \mR, \vb\}$.
 $\mR$ is constrained to be an orthogonal projection matrix achieved by differentiable QR decomposition.
 
+Given a dataset of contrastive pairs $\mathcal{D} = (\va_i^-, \va_i^+)_{i\le n}$ the adaptor parameters $\phi$ are trained.
+The goal is to accurately predict $\va_i^+$ given $\va_i^-$ as input.
+
 Unlike CAA \cite{caa} and ACE \cite{ace} this approach requires paired datapoints as the adaptor needs to learn a transformation from negative examples to positive examples.
 This drawback means that in the low data regime this approach is less effective than the other two approaches.
 However, with sufficient data, this method is able to outperform CAA and ACE as it can utilise more complex transformations between negative and positive behaviour.
@@ -154,6 +160,10 @@ The full adaptor is
     \va_\text{steered} = \va - (\va\mQ)\text{diag}(\vp)\mQ^T + \vb.
 \end{equation}
 This approach also requires paired data to train the parameters, $\phi = \{\mQ, \vl, \vb\}$.
+$\mQ$ is constrained to be orthogonal through differentiable QR decomposition.
+
+Given a dataset of contrastive pairs $\mathcal{D} = (\va_i^-, \va_i^+)_{i\le n}$ the adaptor parameters $\phi$ are trained.
+The goal is to accurately predict $\va_i^+$ given $\va_i^-$ as input.
 
 In the low data regime the adaptor can learn to drop more dimensions and rely on $\vb$ similar to CAA \cite{caa} and ACE \cite{ace}.
 As more data is available the adaptor can rely more on the low-rank projection similar to LoReFT \cite{reft}.
