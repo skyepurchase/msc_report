@@ -8,6 +8,10 @@ Desired model behaviour is considered ``positive" and undesired model behaviour 
 Specifically, an example of the desired behaviour is considered a ``positive example'' and an example of undesired or neutral behaviour is considered a ``negative'' example.
 An example of a behaviour generally includes an input-output pairing similar to training examples however they are more specific pairings than would be using during training.
 
+Throughout the document neural network (NN) and machine learning (ML) model are used interchangeably though NNs are a strict subset of ML models.
+When discussing NNs the concept of a ``neuron'' relates to the abstract structure that receives a real-valued, vector input and outputs a real-value scalar based on internal, learnable weights.
+In practice, this is represented by a single element of a NN layer's output vector.
+
 Vectors are represented by boldface letters, $\vx, \vy, \vz$, scalars are represented by greek letters, $\alpha, \beta, \gamma$, and matrices are represented by boldface capital letters, $\mA, \mB, \mC$.
 Some matrices may represent transformations or collections of feature vectors, context should disambiguate the two.
 In general vectors are column vectors, $\vx = \begin{bmatrix*}
@@ -183,11 +187,9 @@ The underlying technology behind modern generative LLMs is the transformer \cite
 
 \subsection{Transformers}
 
-Transformers \cite{transformers} are now a mainstay of modern deep learning.
+Transformers \cite{transformers} are now a mainstay of modern deep learning.\footnote{This section does not aim to describe transformers in full detail but provide a sufficient background for the rest of the project.
+Keywords are provided for further reading and the explanation is based on the paper by \citet{turner2023}.}
 They utilise the attention mechanism to dynamically transform (sequential) input based on the surrounding context.
-
-This section does not aim to describe transformers in full detail but provide enough background for the rest of the project.
-Keywords are provided for further reading and the explanation is based on the paper by \citet{turner2023}.
 
 Attention can be considered as a learnable lookup table with queries, keys and values.
 If a query and a key are similar then the corresponding value should be returned.
@@ -204,7 +206,7 @@ This allows a model to ``attend" to different parts of the input by adjusting th
 Modern transformers contain attention blocks each containing multiple ``attention heads'' that use the above mechanism.
 This allows the model to respond dynamically to a large range of inputs.
 After this attention block a standard multi-layer perceptron (MLP) is added.
-This constitutes the transformer block and is visualised in \ref{}.
+This constitutes the transformer block and is visualised in \textcolor{red}{INCLUDE FIGURE HERE}.
 
 The ability for transformers to utilise context in surrounding input values makes them particularly suited to natural language processing (NLP).
 The meaning of words in a sentence depend on the words that surround it.
@@ -222,3 +224,29 @@ The process of hiding future tokens at a given token is called ``attention maski
 \subsection{Instruction Tuning}
 
 \section{Sparse Auto-Encoders}
+
+Though the processes to build, train and use a machine learning model are known, these processes and models themselves are not fully understood.
+One line of research that aims to understand how models work is ``mechanistic interpretability''.
+This is the field of reverse engineering how models work, converting structures in the model into human interpretable concepts and algorithms \cite{mech-interp}.
+
+\citet{polysemanticity} found that in vision networks certain neurons are active\footnote{output a non-zero value.} across a range of inputs.
+This idea is known as ``polysemanticity'' as the neuron represents multiple semantic meanings.
+This poses a problem for interpretability as it is not sufficient to assign meaning to specific neurons and check when they are active.
+This phenomenon has been shown to occur in LLMs \textcolor{red}{CITATION NEEDED!!} and has been demonstrated in toy examples \cite{superposition}.
+
+\citet{superposition} propose the idea of ``superposition'' to explain why large models contain polysemantic neurons.
+Superposition is the process of NNs representing more features than neurons within the model.
+The features are no longer represented orthogonally in the representation space but instead share components.
+\textcolor{red}{INCLUDE FIGURE HERE.}
+This means that if only one (sparse) feature is active the non-orthogonal features will also be partially active.
+
+To disentangle the polysemantic neurons requires eliminating the superposition present in the model.
+This is a known problem known as ``sparse dictionary encoding'' \cite{sparse-coding} in neuroscience, in which a signal in superposition is decomposed into sparse elements. \textcolor{red}{NEED BETTER UNDERSTANDING/EXPLANATION.}
+\citet{sae-orig} and \citet{saes} apply the idea to NNs introducing the sparse autoencoder (SAE) which enforces sparsity in its internal representation.
+
+\textcolor{red}{INCLUDE A FIGURE.}
+An SAE is an adaptor that takes a model layer's input and produces a replica of the layer's output.
+In comparison to the model layer the SAE has a large hidden representation dimension in which sparsity is enforced.
+This can be achieved in multiple ways such as clamping to the $k$ highest activations \cite{k-sparsity} or adding a sparsity regularising loss.
+After training the elements of the SAE hidden dimension are given interpretations to better understand the model.
+It is worth noting that SAEs have been shown to demonstrate subpar performance when used for interpretability \cite{saes-bad}, though this project uses SAEs for dataset analysis.
