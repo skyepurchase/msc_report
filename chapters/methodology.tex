@@ -1,7 +1,54 @@
 \chapter{Methodology}
 
 \section{Steering Clear Environment}
+\label{steering-clear}
 
-\section{SAE Environment}
+The setup of this environment follows \cite{steering-clear}.
+The model to steer is a 4-layer multi-layer perceptron (MLP) with residual connections \cite{resnet} across all layers.
+After the MLP, a layernorm \cite{layernorm} and single layer classifier is added.
+All non-linearity throughout the model is gaussian error linear unit (GeLU).
+The hidden layers follow 512-512-256-512 architecture regardless of dataset specifics.
 
-\section{Model-Written Evaluation Environment}
+\subsection{Dataset}
+\label{steering-clear:dataset}
+
+To control the behaviour of model and the steering approaches a synthetic dataset is used.
+Each dataset sample consists of $m$ ``attributes" which can take 8 possible discrete values.
+Each discrete value is represented by an ``anchor'' vector $\vmu_i \in \mathbb{R}^8, i \in \{1,8\}$ sampled from a gaussian distribution $\mathcal{N}(\vzero, 1)$.
+To simulate real-world conditions gaussian noise is added to the samples from $\mathcal{N}(\vzero, 0.1)$.
+This does mean the values are generally highly seperable.
+
+The dataset comprises of $n$ input-output vectors where the input vector is the concatenation of $m$ 8-dimensional vectors.
+Thus, an input vector has length $8m$ and the target vector has length $m$.
+\citet{steering-clear} carry out a range of experiments for $m \in \{60, 90, 120\}$ but always use 8 values represented by 8 dimensional vectors.
+They take a sample of $2,000,000$ i.i.d samples but due to memory constraints only $500,000$ are used in this project.
+No test set is used in either however an 80:20 split for training and validation set is used for identifying the best performing model.
+
+\subsection{Pre-training}
+
+The MLP model is trained on the $500,000$ training samples for 50 epochs using Adam \cite{adam} with a learning rate of $0.001$.
+As per \citet{steering-clear} a cross entropy loss is used to train the model.
+The model that achieves the best validation loss is saved and used for the steering task.
+
+Regardless of exact epochs, learning rate or optimiser the best performing model should achieve close to $100\%$.
+Models used for the presented results achieved $\sim 99\%$.
+
+\subsection{Steering Task}
+
+The task is to successfully steer a model to always predict a specific value for a specific attribute.
+For example, the goal would be steer attribute $3$ towards value $\vmu_1$.
+\citet{steering-clear} carry out three experiments to steer one, two or three attributes simultaneously.
+Instead, this reproduction will focus on steering only one attribute at a time.
+
+As the attribute anchors are generated randomly there is no dataset bias towards any particular value.
+For this reason all attributes are steered towards value $\vmu_1$.
+
+In addition to the dataset generate, $4096$ are generated as a training set for the steering approaches and a further $1000$ are generated as a test set.
+This is repeated 20 times to get an average metric across steering approaches.
+
+\section{Prompt Pairs Environment}
+\label{prompt-pairs}
+
+\subsection{dataset}
+
+\subsection{Steering Task}
