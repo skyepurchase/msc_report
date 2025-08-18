@@ -1,0 +1,63 @@
+\begin{tikzpicture}
+    % DRAW Privileged basis
+    % Draw dashed axes
+    \node[] (xstart) at (-7, 0) {};
+    \node[] (xend) at (-3, 0) {};
+    \node[] (ystart) at (-5, -2) {};
+    \node[] (yend) at (-5, 2) {};
+    \node[] (origin) at (-5, 0) {};
+
+    \draw[dashed, thick, black!50] (xstart) -- (-5,0);
+    \draw[dashed, thick, black!50] (ystart) -- (-5,0);
+    \draw[dashed, thick, orange] (-5,0) -- (xend);
+    \draw[dashed, thick, orange] (-5,0) -- (yend);
+
+    % Draw vectors
+    \draw[thick, ->, >=stealth, line width=2pt] (-4.95,0.05) -- (-4.95,2);
+    \draw[thick, ->, >=stealth, line width=2pt] (-4.95,0.05) -- (-3,0.05);
+
+    \node[draw, fit=(xstart) (xend) (ystart) (yend), label={Privileged Basis}] {};
+
+
+    % DRAW Polysemanticity
+    % Draw dashed axes
+    \node[] (xstart) at (-2, 0) {};
+    \node[] (xend) at (2, 0) {};
+    \node[] (ystart) at (0, -2) {};
+    \node[] (yend) at (0, 2) {};
+
+    \draw[dashed, thick, black!50] (xstart) -- (xend);
+    \draw[dashed, thick, black!50] (ystart) -- (0,0);
+    \draw[dashed, thick, orange] (0,0) -- (yend);
+
+    % Draw vectors
+    \draw[thick, ->, >=stealth, line width=2pt] (0,0) -- ({2*cos(35)}, {2*sin(35)});
+    \draw[thick, ->, >=stealth, line width=2pt] (0,0) -- ({2*cos(125)}, {2*sin(125)});
+
+    \draw[thick, ->, >=stealth, line width=1pt, black!50] ({2*cos(35)}, {2*sin(35)}) -- (0, {2*sin(35)});
+    \draw[thick, ->, >=stealth, line width=1pt, black!50] ({2*cos(125)}, {2*sin(125)}) -- (0, {2*sin(125)});
+
+    \node[draw, fit=(xstart) (xend) (ystart) (yend), label={Polysemanticity}] {};
+
+
+    % Draw Superposition
+    % Draw dashed axes
+    \node[] (xstart) at (3, 0) {};
+    \node[] (xend) at (7, 0) {};
+    \node[] (ystart) at (5, -2) {};
+    \node[] (yend) at (5, 2) {};
+
+    \draw[dashed, thick] (xstart) -- (xend);
+    \draw[dashed, thick, orange] (ystart) -- (yend);
+
+    \draw[thick, ->, >=stealth, line width=2pt] (5,0) -- ({5+2*cos(50)}, {2*sin(50)});
+    \draw[thick, ->, >=stealth, line width=2pt] (5,0) -- ({5+2*cos(125)}, {2*sin(125)});
+    \draw[thick, ->, >=stealth, line width=2pt] (5,0) -- ({5+2*cos(280)}, {2*sin(280)});
+
+    \draw[thick, ->, >=stealth, line width=1pt, black!50] ({5+2*cos(50)}, {2*sin(50)}) -- (5, {2*sin(50)});
+    \draw[thick, ->, >=stealth, line width=1pt, black!50] ({5+2*cos(125)}, {2*sin(125)}) -- (5, {2*sin(125)});
+    \draw[thick, ->, >=stealth, line width=1pt, black!50] ({5+2*cos(280)}, {2*sin(280)}) -- (5, {2*sin(280)});
+
+    \node[draw, fit=(xstart) (xend) (ystart) (yend), label={Superposition}] {};
+
+\end{tikzpicture}

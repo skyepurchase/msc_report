@@ -1,0 +1,35 @@
+\begin{tikzpicture}[node distance=0.5cm]
+    % Draw nodes
+    \node[draw, fill=red!50, minimum width=3cm, rounded corners] (embedding) at (0, 0) {Embedding};
+    \node[draw, circle, above = of embedding] (pos) {};
+    \node[right = 2cm of pos] (postext) {Positional Encoding};
+    \node[draw, fill=orange, minimum width=3cm, rounded corners, above = of pos, align=center] (mha) {Multi-head\\Attention};
+    \node[draw, fill=yellow!70, minimum width=3cm, rounded corners, above = of mha] (layernorm) {Layer Norm.};
+    \node[draw, fill=blue!40, minimum width=3cm, rounded corners, above = of layernorm] (mlp) {MLP};
+    \node[draw, fill=yellow!70, minimum width=3cm, rounded corners, above = of mlp] (out) {Layer Norm.};
+
+    \node[right = 0.1cm of layernorm] (outer) {};
+
+    % Connect them up
+    \draw[thick, ->, >=stealth] ($(embedding) + (0,-0.75)$) -- (embedding);
+
+    \draw[thick, ->, >=stealth] (embedding) -- (pos);
+    \draw[thick, ->, >=stealth] (postext) -- (pos);
+
+    \draw[thick, ->, >=stealth] (pos.north) -- ($ (pos.north) !.5! (mha.south) $) -- ++(0.75,0) -- ($ (mha.south) !.5! (mha.south east) $);
+    \draw[thick, ->, >=stealth] (pos.north) -- ($ (pos.north) !.5! (mha.south) $) -- ++(-0.75,0) -- ($ (mha.south) !.5! (mha.south west) $);
+    \draw[thick, ->, >=stealth] (pos.north) -- (mha.south);
+
+    \draw[thick, ->, >=stealth] ($ (pos.north) !.25! (mha.south) $) -- ++(1.75,0) -- ($(layernorm.east) + (0.25,0)$) -- (layernorm.east);
+
+    \draw[thick, ->, >=stealth] (mha) -- (layernorm);
+    \draw[thick, ->, >=stealth] (layernorm) -- (mlp);
+
+    \draw[thick, ->, >=stealth] ($ (layernorm.north) !.5! (mlp.south) $) -- ++(1.75,0) -- ($(out.east) + (0.25,0)$) -- (out.east);
+
+    \draw[thick, ->, >=stealth] (mlp) -- (out);
+
+    \draw[thick, ->, >=stealth] (out) -- ++(0,0.75);
+
+    \node[draw, fit=(embedding) (out) (outer), dashed, rounded corners] {};
+\end{tikzpicture}

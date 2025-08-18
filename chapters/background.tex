@@ -32,7 +32,12 @@ An intuitative approach to model intervention is to perturb the model's activati
 By calculating a linear direction in activation space from undesired activations towards desired ones this vector can simply be added to all activations in the model during inference.
 The hope is that the model produces output that matches the desired behaviour whilst maintaining the context of the new input.
 
-\textcolor{red}{Add a figure demonstrating this!}
+\begin{figure}
+    \centering
+    \input{chapters/tikz/caa.tex}
+\caption{Demonstration of contrastive activation addition \cite{caa}. The figure represents a simple representation space of dimension 2 with clear separability. $\mu_A = \frac{1}{\|A\|}\sum_{i \in \mathcal{I}(A)} A_i$ where $A$ is a set of activation vectors. A new point, such as the black square, is translated by the steering vector.}
+    \label{fig:caa}
+\end{figure}
 
 In the simplest form consider two example inputs with desired and undesired behaviour.
 Their difference gives a direction in feature space that corresponds to shifting the models output from undesired behaviour towards desired behaviour.
@@ -41,6 +46,7 @@ This is the approach proposed by \citet{activation-addition}, however, it is not
 To improve on this approach \citet{caa} suggest using a collection of examples and calculating their mean difference in activation space.
 This requires the notion of \textit{contrastive pairs}, two inputs that are similar in all ways except for the behaviour that is being changed.
 Hence, this approach is known as \textit{contrastive activation addition} (CAA).
+This process is demonstrated in \Fref{fig:caa}.
 
 Formally, given a set of positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ a \textit{steering vector} for this behaviour is
 \[\vv_{steer} = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).\]
@@ -89,6 +95,14 @@ Removing the behaviour by setting $\alpha^\prime = 0$ yields
                &= \va - \text{proj}_\vr^{\parallel}(\va) + \text{proj}_\vr^{\parallel}(\va_0) \\
                &= \va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr.\footnotemark[1]
 \end{align*}
+
+\begin{figure}
+    \centering
+    \input{chapters/tikz/ace.tex}
+    \caption{A comparison of CAA \cite{caa} and affine concept editting \cite{ace}. This is a reproduction of Figure 1 in \citet{ace} with the steering towards the positive examples instead. Compared to CAA, ACE does not adjust perpendicular components but correctly adjusts those parallel to the steering direction.}
+    \label{fig:ace}
+\end{figure}
+
 This represents the activation lacking the target behaviour but retaining other relevant context.
 \footnotetext[1]{As $\va_0$ exists as a reference point along the steered direction.}
 The behaviour can be reintroduced at any relevant strength resulting in
@@ -100,6 +114,7 @@ Given positive example activations $(\va_i^+)_{i\le n}$ and negative example act
 \begin{align*}
     \va_0 = \frac{1}{n}\sum_{i=1}^{n}\va_i^- && \vr = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).
 \end{align*}
+This process is described graphically in \Fref{fig:ace}
 
 This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
 This is therefore affine and hence the name \textit{affine concept editting} (ACE) \cite{ace}.
@@ -203,10 +218,17 @@ The trick is to have $\mQ$, $\mK$ and $\mV$ all depend on the input features, th
 In this way $\mV$ behaves like a standard weight transformation and the softmax of $\mQ$ and $\mK$ behave like a dynamic weight transformation dependent on the input.
 This allows a model to ``attend" to different parts of the input by adjusting the transformation matrices that make $\mQ, \mK$ and $\mV$.
 
+\begin{figure}
+    \centering
+    \input{chapters/tikz/transformer.tex}
+    \caption{A diagram of the standard transformer decoder block. This is based on Figure 1 of \citet{transformers}. This is a single layer in a large language model where the output of one block is fed into the input of the next.}
+    \label{fig:transformer}
+\end{figure}
+
 Modern transformers contain attention blocks each containing multiple ``attention heads'' that use the above mechanism.
 This allows the model to respond dynamically to a large range of inputs.
 After this attention block a standard multi-layer perceptron (MLP) is added.
-This constitutes the transformer block and is visualised in \textcolor{red}{INCLUDE FIGURE HERE}.
+This constitutes the transformer block and is visualised in \Fref{fig:transformer}.
 
 The ability for transformers to utilise context in surrounding input values makes them particularly suited to natural language processing (NLP).
 The meaning of words in a sentence depend on the words that surround it.
@@ -224,15 +246,23 @@ The process of hiding future tokens at a given token is called ``attention maski
 \subsection{Instruction Tuning}
 
 \section{Sparse Auto-Encoders}
+\label{sec:sae}
 
 Though the processes to build, train and use a machine learning model are known, these processes and models themselves are not fully understood.
 One line of research that aims to understand how models work is ``mechanistic interpretability''.
 This is the field of reverse engineering how models work, converting structures in the model into human interpretable concepts and algorithms \cite{mech-interp}.
 
+\begin{figure}
+    \centering
+    \input{chapters/tikz/superposition.tex}
+    \caption{The three charts demonstrate the different ways a model may organise it's representation space. This figure is a reproduction of \citet{superposition} Figures 2 and 3. The privileged basis means that the representations are aligned with the architectures `preferred' basis. Polysemanticity occurs when a specific neuron is activated by two, potentially unrelated, inputs. Finally, superposition occurs when the model has to embed more representations than privileged bases resulting in forced polysemanticity.}
+    \label{fig:superposition}
+\end{figure}
+
 \citet{polysemanticity} found that in vision networks certain neurons are active\footnote{output a non-zero value.} across a range of inputs.
 This idea is known as ``polysemanticity'' as the neuron represents multiple semantic meanings.
 This poses a problem for interpretability as it is not sufficient to assign meaning to specific neurons and check when they are active.
-This phenomenon has been shown to occur in LLMs \textcolor{red}{CITATION NEEDED!!} and has been demonstrated in toy examples \cite{superposition}.
+This phenomenon has been shown to occur in LLMs and has been demonstrated in toy examples \cite{superposition}.
 
 \citet{superposition} propose the idea of ``superposition'' to explain why large models contain polysemantic neurons.
 Superposition is the process of NNs representing more features than neurons within the model.
@@ -250,3 +280,7 @@ In comparison to the model layer the SAE has a large hidden representation dimen
 This can be achieved in multiple ways such as clamping to the $k$ highest activations \cite{k-sparsity} or adding a sparsity regularising loss.
 After training the elements of the SAE hidden dimension are given interpretations to better understand the model.
 It is worth noting that SAEs have been shown to demonstrate subpar performance when used for interpretability \cite{saes-bad}, though this project uses SAEs for dataset analysis.
+
+SAEs are challenging to train and so for the purposes of this project only pretrained SAEs are used.
+\citet{saelens} provides a large collection of open source SAEs with their corresponding models.
+This does limit the analysis as most models only have an SAE for a single layer.

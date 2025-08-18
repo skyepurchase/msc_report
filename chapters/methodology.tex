@@ -113,6 +113,8 @@ Together these provide insight into how well the adaptor steers the internal mod
 
 To gather information about how well the adaptors effect the output the semantic similarity of the generated model token and the target model token is used.
 Using distilbert \cite{distilbert} as a semantic embedding of words the average cosine similarity between generated word and target word across the test examples is used.
+This provides a metric for the semantic similarity of the models generated text and the target text.
+Only the target word is used as otherwise the metric is dominated by the similarity of the pregenerated text.
 
 Each metric on its own is useful but can be prone to biases that the other metrics highlight.
 A more complete picture of how the adaptors and models behaved can be achieved by analysing all three metrics together.

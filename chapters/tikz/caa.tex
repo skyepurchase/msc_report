@@ -1,0 +1,33 @@
+\begin{tikzpicture}
+
+\foreach \i in {1,...,100} {
+    % generate random coords and save them in dedicated macros
+    \pgfmathsetmacro{\rr}{rnd*2}       % x in [0,6]
+    \pgfmathsetmacro{\rtheta}{rnd*360}   % y in [-3,3]
+    \node[red] at ({\rr*cos(\rtheta)},{\rr*sin(\rtheta)}) {$\times$};
+}
+
+% Second set (green crosses), horizontally shifted
+\foreach \i in {1,...,100} {
+    \pgfmathsetmacro{\rr}{rnd*2}       % x in [0,6]
+    \pgfmathsetmacro{\rtheta}{rnd*360}   % y in [-3,3]
+    \node[green!70!black] at ({7+\rr*cos(\rtheta)},{\rr*sin(\rtheta)}) {$\times$};
+}
+
+% Draw mean points
+\node[circle, fill=red, inner sep=3pt, label={[yshift=4em,xshift=-4em]$\mu_{\va^-}$}] (meanA) at (0,0) {};
+\node[circle, fill=green!70!black, inner sep=3pt, label={[yshift=4em,xshift=4em]$\mu_{\va^+}$}] (meanB) at (7,0) {};
+
+% Draw dashed arrow between means
+\draw[dashed, -{Stealth[length=3mm]}, thick] (meanA) -- (meanB)
+    node[midway, above] {$\vv_{steer} = \mu_{\va^+} - \mu_{\va^-}$};
+
+% Draw random point to steer
+\node[rectangle, fill=black, inner sep=2pt] (test) at (1, 1) {};
+\node[rectangle, fill=green!70!black, inner sep=2pt] (steered) at (8, 1) {};
+
+% Draw dashed arrow between steered points
+\draw[-{Stealth[length=3mm]}, thick] (test) -- (steered)
+    node[midway, above] {$\va_{steer} = \va + \vv_{steered}$};
+
+\end{tikzpicture}
