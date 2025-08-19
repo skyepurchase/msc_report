@@ -1,0 +1,196 @@
+\begin{tikzpicture}[node distance=0.5cm]
+    % Draw Transformer
+    % Draw nodes
+    \node[draw, fill=red!50, minimum width=3cm, rounded corners] (embedding) at (0, 0) {Embedding};
+    \node[draw, circle, above = of embedding] (pos) {};
+    \node[right = 2cm of pos] (postext) {Positional Encoding};
+    \node[draw, fill=orange, minimum width=3cm, rounded corners, above = of pos, align=center] (mha) {Multi-head\\Attention};
+    \node[draw, fill=yellow!70, minimum width=3cm, rounded corners, above = of mha] (layernorm) {Layer Norm.};
+    \node[draw, fill=blue!40, minimum width=3cm, rounded corners, above = of layernorm] (mlp) {MLP};
+    \node[draw, fill=yellow!70, minimum width=3cm, rounded corners, above = of mlp] (out) {Layer Norm.};
+
+    \node[right = 0.1cm of layernorm] (outer) {};
+
+    % Connect them up
+    \draw[thick, ->, >=stealth] ($(embedding) + (0,-0.75)$) -- (embedding);
+
+    \draw[thick, ->, >=stealth] (embedding) -- (pos);
+    \draw[thick, ->, >=stealth] (postext) -- (pos);
+
+    \draw[thick, ->, >=stealth] (pos.north) -- ($ (pos.north) !.5! (mha.south) $) -- ++(0.75,0) -- ($ (mha.south) !.5! (mha.south east) $);
+    \draw[thick, ->, >=stealth] (pos.north) -- ($ (pos.north) !.5! (mha.south) $) -- ++(-0.75,0) -- ($ (mha.south) !.5! (mha.south west) $);
+    \draw[thick, ->, >=stealth] (pos.north) -- (mha.south);
+
+    \draw[thick, ->, >=stealth] ($ (pos.north) !.25! (mha.south) $) -- ++(1.75,0) -- ($(layernorm.east) + (0.25,0)$) -- (layernorm.east);
+
+    \draw[thick, ->, >=stealth] (layernorm) -- (mlp);
+
+    \draw[thick, ->, >=stealth] ($ (layernorm.north) !.5! (mlp.south) $) -- ++(1.75,0) -- ($(out.east) + (0.25,0)$) -- (out.east);
+
+    \draw[thick, ->, >=stealth] (mlp) -- (out);
+
+    \draw[thick, ->, >=stealth] (out) -- ++(0,0.75);
+
+    \node[draw, fit=(embedding) (out) (outer), dashed, rounded corners] {};
+
+    % Draw SAE
+    % Draw nodes
+    \node[
+    draw,
+        minimum width=3cm,
+        fill=blue!40,
+        rounded corners,
+        left = 1.5cm of layernorm,
+        align=center
+    ] (bias) {bias + ReLU};
+    \node[
+    draw,
+        minimum width=3cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        label={[xshift=-3cm,yshift=-0.5cm]sparse features},
+        below = 0.25cm of bias
+    ] (sparse) {};
+    \node[
+        draw,
+        left = -0.45cm of sparse
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!50,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        right = 0.01cm of bit3
+    ] (bit4) {};
+    \node[
+        draw,
+        right = 0.01cm of bit4
+    ] (bit5) {};
+    \node[
+        draw,
+        right = 0.01cm of bit5
+    ] (bit6) {};
+    \node[
+        draw,
+        fill=black!70,
+        right = 0.01cm of bit6
+    ] (bit7) {};
+    \node[
+        draw,
+        right = 0.01cm of bit7
+    ] (bit8) {};
+    \node[
+        draw,
+        right = 0.01cm of bit8
+    ] (bit9) {};
+    \node[
+        draw,
+        right = 0.01cm of bit9
+    ] (bit10) {};
+    \node[
+        draw,
+        fill=yellow!70,
+        trapezium,
+        trapezium angle=120,
+        minimum width=3cm,
+        below = 0.25cm of sparse
+    ] (decoder) {decoder};
+    \node[
+        draw,
+        minimum width=2cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        below = 0.25cm of decoder
+    ] (input) {};
+    \node[
+        draw,
+        fill=black!50,
+        left = -0.4cm of input
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!25,
+        right = 0.1cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=black,
+        right = 0.1cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        right = 0.1cm of bit3
+    ] (bit4) {};
+    \node[
+        draw,
+        fill=black!30,
+        right = 0.1cm of bit4
+    ] (bit5) {};
+    \node[
+        draw,
+        fill=yellow!70,
+        trapezium,
+        trapezium angle=60,
+        minimum width=3cm,
+        above = 0.25cm of bias
+    ] (encoder) {encoder};
+    \node[
+    draw,
+        minimum width=2cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        above = 0.25cm of encoder
+    ] (activation) {};
+    \node[
+        draw,
+        fill=black!50,
+        left = -0.4cm of activation
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!25,
+        right = 0.1cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=black,
+        right = 0.1cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        right = 0.1cm of bit3
+    ] (bit4) {};
+    \node[
+        draw,
+        fill=black!30,
+        right = 0.1cm of bit4
+    ] (bit5) {};
+
+    % Connect them up
+    \draw[thick, ->, >=stealth] (input.north) -- (decoder.south);
+    \draw[thick, ->, >=stealth] (decoder.north) -- (sparse.south);
+    \draw[thick, ->, >=stealth] (sparse.north) -- (bias.south);
+    \draw[thick, ->, >=stealth] (bias.north) -- (encoder.south);
+    \draw[thick, ->, >=stealth] (encoder.north) -- (activation.south);
+
+    % Join the two
+    \draw[thick, ->, >=stealth] (mha.north) -- ($(mha.north) !0.3! (layernorm.south)$) -- ++(-2.5,0) -- ($(input.south east) + (1,-0.3)$) -- ($(input.south) + (0,-0.3)$) -- (input.south);
+    \draw[thick, ->, >=stealth] (activation.north) -- ++(0,0.3) -- ($(activation.north east) + (1,0.3)$) -- ($(mha.north) !0.6! (layernorm.south) + (-2.5,0)$) -- ++(2.5,0) -- (layernorm.south);
+
+    \node[
+        draw,
+        fill=orange,
+        fill opacity=0.1,
+        fit=(input) (sparse) (activation),
+        dashed,
+        label={[yshift=0.3cm]Sparse Autoencoder},
+        rounded corners
+    ] {};
+
+\end{tikzpicture}

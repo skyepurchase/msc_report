@@ -34,6 +34,7 @@ The hope is that the model produces output that matches the desired behaviour wh
 
 \begin{figure}
     \centering
+    \captionsetup{width=.9\textwidth}
     \input{chapters/tikz/caa.tex}
 \caption{Demonstration of contrastive activation addition \cite{caa}. The figure represents a simple representation space of dimension 2 with clear separability. $\mu_A = \frac{1}{\|A\|}\sum_{i \in \mathcal{I}(A)} A_i$ where $A$ is a set of activation vectors. A new point, such as the black square, is translated by the steering vector.}
     \label{fig:caa}
@@ -98,6 +99,7 @@ Removing the behaviour by setting $\alpha^\prime = 0$ yields
 
 \begin{figure}
     \centering
+    \captionsetup{width=.9\textwidth}
     \input{chapters/tikz/ace.tex}
     \caption{A comparison of CAA \cite{caa} and affine concept editting \cite{ace}. This is a reproduction of Figure 1 in \citet{ace} with the steering towards the positive examples instead. Compared to CAA, ACE does not adjust perpendicular components but correctly adjusts those parallel to the steering direction.}
     \label{fig:ace}
@@ -220,6 +222,7 @@ This allows a model to ``attend" to different parts of the input by adjusting th
 
 \begin{figure}
     \centering
+    \captionsetup{width=.9\textwidth}
     \input{chapters/tikz/transformer.tex}
     \caption{A diagram of the standard transformer decoder block. This is based on Figure 1 of \citet{transformers}. This is a single layer in a large language model where the output of one block is fed into the input of the next.}
     \label{fig:transformer}
@@ -254,6 +257,7 @@ This is the field of reverse engineering how models work, converting structures 
 
 \begin{figure}
     \centering
+    \captionsetup{width=.9\textwidth}
     \input{chapters/tikz/superposition.tex}
     \caption{The three charts demonstrate the different ways a model may organise it's representation space. This figure is a reproduction of \citet{superposition} Figures 2 and 3. The privileged basis means that the representations are aligned with the architectures `preferred' basis. Polysemanticity occurs when a specific neuron is activated by two, potentially unrelated, inputs. Finally, superposition occurs when the model has to embed more representations than privileged bases resulting in forced polysemanticity.}
     \label{fig:superposition}
@@ -267,14 +271,22 @@ This phenomenon has been shown to occur in LLMs and has been demonstrated in toy
 \citet{superposition} propose the idea of ``superposition'' to explain why large models contain polysemantic neurons.
 Superposition is the process of NNs representing more features than neurons within the model.
 The features are no longer represented orthogonally in the representation space but instead share components.
-\textcolor{red}{INCLUDE FIGURE HERE.}
 This means that if only one (sparse) feature is active the non-orthogonal features will also be partially active.
+This idea is represented in \Fref{fig:superposition}.
+
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \input{chapters/tikz/sae.tex}
+    \caption{The sparse autoencoder is inserted at a specific location within the transformer block. The decoder transforms the input into a sparse vector representation and the decoder aims to reconstruct the input to feed back into the transformer. This way the sparse features do not have the superposition problem and relate to the models internal representation.}
+    \label{fig:sae}
+\end{figure}
 
 To disentangle the polysemantic neurons requires eliminating the superposition present in the model.
 This is a known problem known as ``sparse dictionary encoding'' \cite{sparse-coding} in neuroscience, in which a signal in superposition is decomposed into sparse elements. \textcolor{red}{NEED BETTER UNDERSTANDING/EXPLANATION.}
 \citet{sae-orig} and \citet{saes} apply the idea to NNs introducing the sparse autoencoder (SAE) which enforces sparsity in its internal representation.
+The SAE module is demonstrated in \Fref{fig:sae}.
 
-\textcolor{red}{INCLUDE A FIGURE.}
 An SAE is an adaptor that takes a model layer's input and produces a replica of the layer's output.
 In comparison to the model layer the SAE has a large hidden representation dimension in which sparsity is enforced.
 This can be achieved in multiple ways such as clamping to the $k$ highest activations \cite{k-sparsity} or adding a sparsity regularising loss.
