@@ -1,0 +1,319 @@
+\begin{tikzpicture}[node distance=0.3cm]
+    % Draw LLM
+    % Draw nodes
+    \node[
+        draw,
+        fill=black!30,
+        minimum width=2cm,
+        inner ysep=0.2cm,
+        rounded corners
+    ] (layer1) at (0, 0) {};
+    \node[
+        draw,
+        fill=black!30,
+        minimum width=2cm,
+        inner ysep=0.2cm,
+        rounded corners,
+        above = of layer1
+    ] (layer2) {};
+    \node[
+        draw,
+        fill=black!30,
+        minimum width=2cm,
+        inner ysep=0.2cm,
+        rounded corners,
+        above = of layer2
+    ] (layer3) {};
+    \node[
+        draw,
+        fill=black!30,
+        minimum width=2cm,
+        inner ysep=0.2cm,
+        rounded corners,
+        above = of layer3
+    ] (layer4) {};
+    \node[
+        draw,
+        fill=black!30,
+        minimum width=2cm,
+        inner ysep=0.2cm,
+        rounded corners,
+        above = of layer4
+    ] (layer5) {};
+    \node[
+        draw,
+        fill=black!30,
+        minimum width=2cm,
+        inner ysep=0.2cm,
+        rounded corners,
+        above = of layer5
+    ] (layer6) {};
+
+    \node[right = 0.1cm of layer4] (outer) {};
+
+    % Connect them up
+    \draw[thick, ->, >=stealth] ($(layer1) + (0,-0.75)$) -- (layer1.south);
+    \draw[thick, ->, >=stealth] (layer1.north) -- (layer2.south);
+    \draw[thick, ->, >=stealth] (layer2.north) -- (layer3.south);
+    \draw[thick, ->, >=stealth] (layer3.north) -- (layer4.south);
+    \draw[thick, ->, >=stealth] (layer4.north) -- (layer5.south);
+    \draw[thick, ->, >=stealth] (layer5.north) -- (layer6.south);
+    \draw[thick, ->, >=stealth] (layer6.north) -- ++(0,0.5);
+
+    % Draw SAE
+    % Draw nodes
+    \node[
+        draw,
+        fill=green!70,
+        minimum width=1cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        left = 1.5cm of layer4
+    ] (base) {};
+    \node[
+        draw,
+        fill=white,
+        left = -0.4cm of base
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!50,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=white,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        fill=green!70,
+        trapezium,
+        trapezium angle=60,
+        minimum width=1.5cm,
+        below = 0.25cm of base
+    ] (R) {R};
+    \node[
+        draw,
+        minimum width=1.5cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        below = of R,
+    ] (input) {};
+    \node[
+        draw,
+        fill=black!50,
+        left = -0.35cm of input
+    ] (bit1) {};
+    \node[
+        draw,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=black!25,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        fill=black!90,
+        right = 0.01cm of bit3
+    ] (bit4) {};
+    \node[
+        draw,
+        fill=black!10,
+        right = 0.01cm of bit4
+    ] (bit5) {};
+    \node[
+        draw,
+        fill=yellow!70,
+        minimum width=1cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        left = 2cm of base
+    ] (source) {};
+    \node[
+        draw,
+        fill=black!70,
+        left = -0.4cm of source
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!20,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=white,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        fill=yellow!70,
+        trapezium,
+        trapezium angle=60,
+        minimum width=1.5cm,
+        below = 0.25cm of source
+    ] (W) {W};
+    \node[
+        draw,
+        minimum width=1.5cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        below = of W,
+    ] (input2) {};
+    \node[
+        draw,
+        fill=black!50,
+        left = -0.35cm of input2
+    ] (bit1) {};
+    \node[
+        draw,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=black!25,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        fill=black!90,
+        right = 0.01cm of bit3
+    ] (bit4) {};
+    \node[
+        draw,
+        fill=black!10,
+        right = 0.01cm of bit4
+    ] (bit5) {};
+    \node[
+        draw,
+        fill=red!30!blue!20!white,
+        minimum width=1cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        label={[yshift=-0.9cm]bias},
+        left = 0.5cm of base
+    ] (bias) {};
+    \node[
+        draw,
+        fill=white,
+        left = -0.4cm of bias
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!90,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=black!10,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        fill=green!70,
+        trapezium,
+        trapezium angle=120,
+        minimum width=1.5cm,
+        above = 0.4cm of bias
+    ] (RT) {$R^T$};
+    \node[
+        draw,
+        minimum width=1.5cm,
+        rounded corners,
+        inner ysep=0.2cm,
+        above = of RT
+    ] (activation) {};
+    \node[
+        draw,
+        left = -0.35cm of activation
+    ] (bit1) {};
+    \node[
+        draw,
+        fill=black!50,
+        right = 0.01cm of bit1
+    ] (bit2) {};
+    \node[
+        draw,
+        fill=black!50,
+        right = 0.01cm of bit2
+    ] (bit3) {};
+    \node[
+        draw,
+        fill=black!80,
+        right = 0.01cm of bit3
+    ] (bit4) {};
+    \node[
+        draw,
+        fill=black!10,
+        right = 0.01cm of bit4
+    ] (bit5) {};
+
+    % arithmetic symbols
+    \node[
+        left = -0.01cm of bias
+    ] {$+$};
+    \node[
+        right = -0.01cm of bias
+    ] {$-$};
+
+    % Connect them up
+    \draw[thick, ->, >=stealth] (input.north) -- (R.south);
+    \draw[thick, ->, >=stealth] (input2.north) -- (W.south);
+    \draw[thick, ->, >=stealth] (R.north) -- (base.south);
+    \draw[thick, ->, >=stealth] (W.north) -- (source.south);
+    \draw[thick, ->, >=stealth] (RT.north) -- (activation.south);
+
+    \draw[thick, ->, >=stealth]
+        (base.north)
+        -- ++(0,0.2)
+        -- ($(RT.south) - (0,0.2)$)
+        -- (RT.south);
+    \draw[thick, ->, >=stealth]
+        (source.north)
+        -- ++(0,0.2)
+        -- ($(RT.south) - (0,0.2)$)
+        -- (RT.south);
+    \draw[thick, ->, >=stealth]
+        (bias.north)
+        -- ++(0,0.2)
+        -- ($(RT.south) - (0,0.2)$)
+        -- (RT.south);
+
+    % Join the two
+    \draw[thick, ->, >=stealth]
+        ($(layer3.north) !0.4! (layer4.south)$)
+        -- ++(-1.5,0)
+        -- ($(input.south east) + (0.75,-0.3)$)
+        -- ($(input.south) + (0,-0.3)$)
+        -- (input.south);
+    \draw[thick, ->, >=stealth]
+        ($(layer3.north) !0.4! (layer4.south)$)
+        -- ++(-1.5,0)
+        -- ($(input.south east) + (0.75,-0.3)$)
+        -- ($(input2.south) + (0,-0.3)$)
+        -- (input2.south);
+    \draw[thick, ->, >=stealth]
+        (activation.north)
+        -- ++(0,0.3)
+        -- ($(activation.north east) + (2.275,0.3)$)
+        -- ($(layer4.north) !0.4! (layer5.south) + (-1.5,0)$)
+        -- ($(layer4.north) !0.4! (layer5.south)$);
+
+    \node[
+        draw,
+        fit=(input) (input2) (activation),
+        dashed,
+        label={[yshift=0.3cm]Low Rank Adaptor},
+        rounded corners
+    ] {};
+    \node[
+        draw,
+        fit=(layer1) (layer6),
+        dashed,
+        label={[yshift=0.65cm]Model},
+        rounded corners
+    ] {};
+
+\end{tikzpicture}

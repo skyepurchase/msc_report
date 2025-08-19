@@ -140,6 +140,14 @@ The specific approach is based on the distributed interchange intervention\footn
 \end{equation*}
 where $\mR \in \mathbb{R}^{r\times d}$ is a low-rank projection matrix.
 
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \input{chapters/tikz/loreft.tex}
+    \caption{This figure demonstrates how the low-rank representation finetuning adaptor \cite{reft} operates. Unlike methods such as LoRA \cite{lora} this does replace the layer weights but simply adds the layer output. LoReST \cite{steering-clear} behaves similarly though the adaptor has a different architecture. This is a reproduction of Figure 2(2) in \citet{reft}.}
+     \label{fig:loreft}
+\end{figure}
+
 \citet{reft} suggest replacing $\mR\vy$ with an affine transformation $\mW\vx + \vb$.
 Thus, the adaptor learns a transformation, $\mR\va^+ = \mW\va^- + \vb$, from negative activations to positive low-rank representations.
 In this way the adaptor can learn low-rank representations of activations that encapsulate the desired behaviour and adjust the activations in a parameter efficient space.
