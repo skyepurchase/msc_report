@@ -4,7 +4,7 @@
 \usepackage{tablefootnote}
 
 % Graphics
-\usepackage{graphicx,caption}
+\usepackage{graphicx,caption,subcaption}
 \usepackage{dirtree}
 \usepackage{tikz}
 \usetikzlibrary{
@@ -42,7 +42,7 @@
 \usepackage{mathtools}
 
 % Better references and citations
-\usepackage[numbers,compress,sort]{natbib}
+\usepackage[sort]{natbib}
 \usepackage{cleveref}
 
 \usepackage[inkscapeformat=png]{svg}
@@ -59,3 +59,6 @@
 \newcommand{\Aref}[1]{Appendix \ref{#1}}
 \newcommand{\Eref}[1]{Equation \ref{#1}}
 \newcommand{\Fref}[1]{Figure \ref{#1}}
+
+% Citing
+\newcommand{\cites}[1]{\citeauthor{#1}\textcolor{blue}{'s} \citeyear{#1}}

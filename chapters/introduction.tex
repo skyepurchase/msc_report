@@ -1,5 +1,7 @@
 \chapter{Introduction}
 
+\section{Benefits of Steering Vectors}
+
 \section{Related Work}
 
 \smalltitle{\citet{steering-clear}}
@@ -8,7 +10,7 @@ They compare a range of steering techniques \cite{caa, reft, mimic} against each
 Inspired by LoReFT \cite{reft} they introduce their own technique LoReST and demonstrate competitive performance to the other techniques.
 
 This project reproduces a sample of plots from Figure 1 using the same toy setup described in \Sref{steering-clear}.
-In addition to the techniques used in the original paper the reproduction also analyses the behaviour of \cite{ace}.
+In addition to the techniques used in the original paper the reproduction also analyses the behaviour of \citet{ace}.
 
 This project aims to expand the analysis carried out by \citet{steering-clear} to reproduce the same effects in large language model systems.
 Additionally, the relationship between the negative and positive training examples is analysed to gain a better insight as to when steering approaches fail.
@@ -23,8 +25,26 @@ Building on their work this project aims to analyse a larger range of techniques
 Furthermore, the properties of training datasets is analysed in more depth to determine which properties cause steering techniques to fail.
 
 Rather than use model written evaluations \cite{mwe} a new set of steering datasets is generated with more fine grain control.
-The construction of these datasets is described in \Sref{prompt-pairs}.
+The construction of these datasets is described in \Sref{sec:prompt-pairs}.
 
 \smalltitle{\citet{steering-taxonomy}}
+present a full taxonomy of current steering vector approaches (more generally \emph{representation engineering}).
+The approaches include those in \citet{steering-clear}, however, it is impractical to expand the experiments to all the approaches described due to time constraints.
+
+The paper covers a range of topics within representation engineering that have been carried out by the community.
+These focus on the types of adaptors used, the prompting framework, linear vs. non-linear adaptors, the concepts that are steered, etc.
+
+This project continues these comparisons by analysing the effect of the dataset and number of steering examples used akin to \citet{steering-clear} in the large language model setting.
+The analysis is related to \cites{steering-taxonomy} suggestion to analyse spurious correlations in the dataset as a potential failure case for steering vectors.
+\textcolor{red}{HOW?? NEED TO DO MORE IN DEPTH ANALYSIS ME THINKS.}
+
+\smalltitle{Sparse autoencoders as steering vectors}
+There are multiple papers that utilise sparse autoencoders (SAEs) as steering vectors \cite{sae-improved, sae-steering, icl-sae}.
+These approaches utilise the fact that SAEs decode high level concepts from the models intermediate representation.
+This can be used to manipulate the representation towards a target concept.
+
+Rather than utilising SAEs to steer the model this project uses the SAE features to evaluate models on free form prompts.
+The SAE features provide a metric to evaluate how well the models internal representation has been effectively steered.
+SAEs are explained in \Sref{sec:sae} and their use in the project is described in \Sref{sec:prompt-pairs}.
 
 \section{Contributions}
