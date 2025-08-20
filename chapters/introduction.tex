@@ -6,8 +6,8 @@
 
 \smalltitle{\citet{steering-clear}}
 aim to analyse steering in a toy environment where they are able to control the representation density within the model.
-They compare a range of steering techniques \cite{caa, reft, mimic} against each other in a controlled setting to evaluate the benefits and drawbacks of each approach.
-Inspired by LoReFT \cite{reft} they introduce their own technique LoReST and demonstrate competitive performance to the other techniques.
+They compare a range of steering techniques \citep{caa, reft, mimic} against each other in a controlled setting to evaluate the benefits and drawbacks of each approach.
+Inspired by LoReFT \citep{reft} they introduce their own technique LoReST and demonstrate competitive performance to the other techniques.
 
 This project reproduces a sample of plots from Figure 1 using the same toy setup described in \Sref{steering-clear}.
 In addition to the techniques used in the original paper the reproduction also analyses the behaviour of \citet{ace}.
@@ -20,11 +20,11 @@ aim to analyse the generalisation of steering vectors across a range of steering
 They analyse the variability of success and introduce the notion of steerability.
 Using this notion they demonstrate that many techniques fail to generalise on certain datasets both in and out of distribution.
 
-The analysis is limited to only contrastive activation addition \cite{caa} which \citet{steering-clear} show is not necessarily the ideal candidate.
+The analysis is limited to only contrastive activation addition \citep{caa} which \citet{steering-clear} show is not necessarily the ideal candidate.
 Building on their work this project aims to analyse a larger range of techniques sampled from \citet{steering-clear}.
 Furthermore, the properties of training datasets is analysed in more depth to determine which properties cause steering techniques to fail.
 
-Rather than use model written evaluations \cite{mwe} a new set of steering datasets is generated with more fine grain control.
+Rather than use model written evaluations \citep{mwe} a new set of steering datasets is generated with more fine grain control.
 The construction of these datasets is described in \Sref{sec:prompt-pairs}.
 
 \smalltitle{\citet{steering-taxonomy}}
@@ -39,7 +39,7 @@ The analysis is related to \cites{steering-taxonomy} suggestion to analyse spuri
 \textcolor{red}{HOW?? NEED TO DO MORE IN DEPTH ANALYSIS ME THINKS.}
 
 \smalltitle{Sparse autoencoders as steering vectors}
-There are multiple papers that utilise sparse autoencoders (SAEs) as steering vectors \cite{sae-improved, sae-steering, icl-sae}.
+There are multiple papers that utilise sparse autoencoders (SAEs) as steering vectors \citep{sae-improved, sae-steering, icl-sae}.
 These approaches utilise the fact that SAEs decode high level concepts from the models intermediate representation.
 This can be used to manipulate the representation towards a target concept.
 
