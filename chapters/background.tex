@@ -20,6 +20,8 @@ In general vectors are column vectors, $\vx = \begin{bmatrix*}
 
 In a multi-layer machine learning model the output of an internal layer is an ``activation'' denoted $\va$.
 A positive activation is denoted $\va^+$ and a negative activation is denoted as $\va^-$. Here, ``positive activation'' means the activation extracted from the model given a positive example as above.
+The mean of a set of activations, $\mathcal{A} = \{\va_i\}_{i < n}$, is denoted $\mu_\mathcal{A} = \frac{1}{n}\sum_{i=1}^{n}\va_i$.
+Frequently the set of set of activations will be the positive activation or negative activation set, in this case the mean is denoted $\mu_{\va^+}$ or $\mu_{\va^-}$ respectively.
 
 \section{Model Alignment}
 
