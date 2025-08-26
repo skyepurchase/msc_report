@@ -1,7 +1,7 @@
 \chapter{Methodology}
 
 \section{Steering Clear Environment}
-\label{steering-clear}
+\label{sec:steering-clear}
 
 The setup of this environment follows \citep{steering-clear}.
 The model to steer is a 4-layer multi-layer perceptron (MLP) with residual connections \citep{resnet} across all layers.
@@ -99,7 +99,7 @@ The experiments are also run without any adaptor to get a baseline value to comp
 \textcolor{red}{MIGHT BE WORTH DOING INDIVIDUAL DATASETS.}
 All steering metrics are averaged over the range of datasets to get an average efficacy across the datasets.
 
-\smalltitle{Steering metrics.} Unlike the steering clear environment \Sref{steering-clear}, it is hard to quantify accuracy on the steered attribute.
+\smalltitle{Steering metrics.} Unlike the steering clear environment \Sref{sec:steering-clear}, it is hard to quantify accuracy on the steered attribute.
 Instead 3 metrics are used to evaluate the success of the steering approach.
 
 Two are based on the SAE, \Sref{sec:sae}, features of the final, target token of the model at the target layer:
@@ -118,5 +118,3 @@ Only the target word is used as otherwise the metric is dominated by the similar
 
 Each metric on its own is useful but can be prone to biases that the other metrics highlight.
 A more complete picture of how the adaptors and models behaved can be achieved by analysing all three metrics together.
-
-\section{Prompting LLMs}
