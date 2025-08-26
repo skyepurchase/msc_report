@@ -2,4 +2,18 @@
 
 \section{Limitations}
 
+The primary limitation of the project is using GPT-2 which has a limited context window and ability for high-level reasoning.
+This means that the results of this project will not necessarily scale to modern LLMs such as Gemma, GPT-4, Llama-3, etc.
+Though the results do demonstrate how steering adaptors behave in a natural language setting there is still more work to be done on quantitative analysis of steering adaptors.
+
+Further limitations include the adaptors chosen.
+The adaptors presented in this work are chosen to represent a range of steering adaptors currently proposed, however, there are many more techniques that would behave differently.
+Clear examples include minimally modified counterfactuals \citep{mimic} which was used in \citet{steering-clear} and probes \citep{probes}.
+This project already demonstrates the wide performance range of the few commonly used adaptors, analysing the performance of more adaptors would give a better overview of represenation engineering as a whole.
+
+Finally the datasets used are small, both in the number of examples and in the number of distinct sets.
+Only 5 different sets were used to generate the results in \Sref{sec:steering-clear-res} each with at most 3000 unique prompts.
+This fails to completely capture the full range of representations that the model may contain.
+Considering that the sparse autoencoder dimension for GPT-2 is 24576 \citep{saelens} 5 datasets are unlikely to encompass all concepts present in the model representation.
+
 \section{Future Work}
