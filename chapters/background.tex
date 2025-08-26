@@ -8,9 +8,14 @@ Desired model behaviour is considered ``positive" and undesired model behaviour 
 Specifically, an example of the desired behaviour is considered a ``positive example'' and an example of undesired or neutral behaviour is considered a ``negative'' example.
 An example of a behaviour generally includes an input-output pairing similar to training examples however they are more specific pairings than would be using during training.
 
-Throughout the document neural network (NN) and machine learning (ML) model are used interchangeably though NNs are a strict subset of ML models.
+Throughout this report neural network (NN) and machine learning (ML) model are used interchangeably though NNs are a strict subset of ML models.
+In general the term ``model'' is used to refer to the collective group and represents any program that adjusts tunable parameters to predict output from input examples.
+
 When discussing NNs the concept of a ``neuron'' relates to the abstract structure that receives a real-valued, vector input and outputs a real-value scalar based on internal, learnable weights.
 In practice, this is represented by a single element of a NN layer's output vector.
+Furthermore, a \emph{module} refers to a collection of one or more NN layers.
+A model may be made of multiple modules or be a single module.
+Modules may be ``attached'' to specific layers within a model whereby the output of the layer is passed to the module as input and the module may augment, store, or monitor the data flow in the model.
 
 Vectors are represented by boldface letters, $\vx, \vy, \vz$, scalars are represented by greek letters, $\alpha, \beta, \gamma$, and matrices are represented by boldface capital letters, $\mA, \mB, \mC$.
 Some matrices may represent transformations or collections of feature vectors, context should disambiguate the two.
@@ -25,7 +30,39 @@ Frequently the set of set of activations will be the positive activation or nega
 
 \section{Model Alignment}
 
-\section{Model Intervention}
+As models increase in capabilities \citep{} they pose an increasing risk to their users \citep{c.ai, psychosis} and potentially humanity at large \citep{survellience, deepfakes, disempowerment}.
+The underlying issue is that these models may be \emph{misaligned} \citep{agent-alignment}, that is to say they do not behaviour in line with users intentions.
+The problem of aligning models is referred to as the \emph{alignment problem} or, within reinforcement learning \cite{rl}, the \emph{agent alignment problem} \citep{agent-alignment}.\footnote{An \emph{agent} is a reinforcement learning term for any entity that interacts with a learning environment and updates it's internal state to better achieve a predetermined goal. In this case, the model behaves as an agent.}
+
+\citet{agent-alignment} present the agent alignment problem and propose \emph{reward modelling} as a potential avenue to align agents.
+They outline a couple of assumptions as to whether reward modelling is suitable:
+\begin{itemize}[nolistsep]
+    \item It is possible to sufficiently learn user intentions.
+    \item It is cheaper to evaluate outcomes than produce the ``correct'' behaviour.
+\end{itemize}
+Working on this, \citet{rlhf} apply these ideas to large language models (LLM)s.
+The goal is to transform purely predictive LLMs into assistants that are ``helpful'', ``honest'', and ``harmless''.
+This is achieved by utilising human feedback on LLM output as rewards for reward modelling.
+This technique paved the way for the model AI chatbot \citep{chatgpt}.
+The technique of reinforcement learning from human feedback (RLHF) had been developed previously by \citet{rlhf-orig} but had not been applied to LLMs.
+
+RLHF has been shown to be very effective in transforming the behaviour of models.
+However, it is still possible for RLHF ``aligned'' models to be misaligned \citep{misgeneralization, c.ai}.
+Furthermore, this approach to alignment is very costly requiring human annotators, reviewers and the costly process of finetuning.
+Techniques to mitigate this have been proposed including RLxF \citep{alignment-survey}, utilising both human and AI feedback, representation finetuning \citep{reft}, and parameter efficient finetuning \citep{peft}.
+
+Representation finetuning or more generally representation engineering \citep{steering-taxonomy} presents a promising avenue for alignment \citep{steering-clear, steering-theory, steering-taxonomy}.
+Rather than requiring large amounts of human annotated data and changing model weights only the representations need editting.
+This thesis focuses on \emph{steering adaptors}, a subset of representation engineering.
+
+\section{Steering Adaptors}
+
+The general form of a steering adaptor is a simple module that augments a layer's output.
+The idea is to change the internal representation away from a harmful or misaligned concept towards one that is aligned to the users intentions.
+The goal is to keep all other aspects of the representation intact so that the performance of the model is not hindered.
+
+Rather than large amounts of annotated data or large weight matrices these techniques require a handful of positive and negative examples.
+Given their lightweight nature these techniques have shown promising results \citep{steering-taxonomy, steering-theory, steering-clear, reft}.
 
 \subsection{Contrastive Activation Addition}
 \label{caa}
@@ -70,21 +107,24 @@ The approach assumes that concepts in activation space are linear which \citet{n
 Techniques such as affine concept editting (ACE) \Sref{ace} use an affine approach to overcome these drawbacks.
 
 \subsection{Affine Concept Editting}
-\label{ace}
+\label{sec:ace}
 
 \citet{ace} claim that CAA \citep{caa} is not sufficiently general as it does not consider how much the desired behaviour is already present.
 To see this consider an arbitrary activation vector $\va$ and steering direction $\vr$ encoding some behaviour.
 $\va$ can be decomposed as the perpendicular and parallel components of $\vr$
-\begin{align*}
-    \va &= \text{proj}_\vr^{\perp}(\va) + \text{proj}_\vr^{\parallel}(\va) \\
-        &= \text{proj}_\vr^{\perp}(\va) + \alpha\vr.
-\end{align*}
+\begin{equation}
+    \label{eq:components}
+    \begin{aligned}
+        \va &= \text{proj}_\vr^{\perp}(\va) + \text{proj}_\vr^{\parallel}(\va) \\
+            &= \text{proj}_\vr^{\perp}(\va) + \alpha\vr.
+    \end{aligned}
+\end{equation}
 Adding $\lambda\vr$ as per \Eref{eq:caa} will be inconsistent as $\alpha + \lambda$ will not be equivalent across all (negative) activations.
 This shows that CAA \citep{caa} does not account for how much a behaviour may already be present in an activation.
 
 Furthemore, it is not (generally) the case that $\mathbf{0}$ represents lack of behaviour.
 Instead there is some vector $\va_0$ that represents the lack of the target behaviour.
-The above equation can incorporate this idea as follows
+\Eref{eq:components} can incorporate this idea as follows
 \begin{align*}
     \va &= \va_0 + \Delta\va \\
         &= \va_0 + \text{proj}_\vr^{\perp}(\Delta\va) + \text{proj}_\vr^{\parallel}(\Delta\va) \\
@@ -114,11 +154,12 @@ The behaviour can be reintroduced at any relevant strength resulting in
     \label{eq:ace}
     \va_\text{steered} = \va_0 - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
 \end{equation}
+This process is described graphically in \Fref{fig:ace}.
+
 Given positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ the reference point and steering direction are
 \begin{align*}
     \va_0 = \frac{1}{n}\sum_{i=1}^{n}\va_i^- && \vr = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).
 \end{align*}
-This process is described graphically in \Fref{fig:ace}
 
 This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
 This is therefore affine and hence the name \textit{affine concept editting} (ACE) \citep{ace}.
@@ -256,8 +297,6 @@ This allows the model to distinguish between the two instances of ``can'' in the
 It is important to note that when training a model to generate natural language it must be trained without access to future tokens.
 The process of hiding future tokens at a given token is called ``attention masking'' and is only applied in the attention blocks.
 
-\subsection{Instruction Tuning}
-
 \section{Sparse Auto-Encoders}
 \label{sec:sae}
 
@@ -293,7 +332,7 @@ This idea is represented in \Fref{fig:superposition}.
 \end{figure}
 
 To disentangle the polysemantic neurons requires eliminating the superposition present in the model.
-This is a known problem known as ``sparse dictionary encoding'' \citep{sparse-coding} in neuroscience, in which a signal in superposition is decomposed into sparse elements. \textcolor{red}{NEED BETTER UNDERSTANDING/EXPLANATION.}
+This is a known problem known as ``sparse dictionary encoding'' \citep{sparse-coding} in neuroscience, in which a signal in superposition is decomposed into sparse elements.
 \citet{sae-orig} and \citet{saes} apply the idea to NNs introducing the sparse autoencoder (SAE) which enforces sparsity in its internal representation.
 The SAE module is demonstrated in \Fref{fig:sae}.
 
