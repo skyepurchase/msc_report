@@ -21,11 +21,11 @@
     node[midway, right] {$\vv_{steer}$};
 
 % Draw 'random' points and steer
-\node[draw, circle, red, dashed, inner sep=2pt] (test1A) at (-0.7, 1.7) {};
-\node[circle, fill=green!70!black, dashed, inner sep=2pt] (test1B) at (-1.7, 2.7) {};
+\node[draw, circle, black, dashed, inner sep=2pt] (test1A) at (-0.7, 1.7) {};
+\node[circle, fill=green!70!black, inner sep=2pt] (test1B) at (-1.7, 2.7) {};
 
-\node[draw, circle, red, dashed, inner sep=2pt] (test2A) at (1, 2.5) {};
-\node[circle, fill=green!70!black, dashed, inner sep=2pt] (test2B) at (0, 3.5) {};
+\node[draw, circle, black, dashed, inner sep=2pt] (test2A) at (1, 2.5) {};
+\node[circle, fill=green!70!black, inner sep=2pt] (test2B) at (0, 3.5) {};
 
 \draw[blue!70, -{Stealth[length=3mm]}, thick] (test1A) -- (test1B);
 \draw[blue!70, -{Stealth[length=3mm]}, thick] (test2A) -- (test2B);
@@ -55,16 +55,21 @@
     node[midway, right] {$\vv_{steer}$};
 
 % Draw 'random' points and steer
-\node[draw, circle, red, dashed, inner sep=2pt] (test1A) at (6.3, 1.7) {};
-\node[circle, fill=green!70!black, dashed, inner sep=2pt] (test1B) at (6, 2) {};
+\node[draw, circle, black, dashed, inner sep=2pt] (test1A) at (6.3, 1.7) {};
+\node[draw, circle, red, dashed, inner sep=2pt] (orig1) at (7, 1) {};
+\node[circle, fill=green!70!black, inner sep=2pt] (test1B) at (6, 2) {};
 
-\node[draw, circle, red, dashed, inner sep=2pt] (test2A) at (8, 2.5) {};
-\node[circle, fill=green!70!black, dashed, inner sep=2pt] (test2B) at (7.25, 3.25) {};
+\node[draw, circle, black, dashed, inner sep=2pt] (test2A) at (8, 2.5) {};
+\node[draw, circle, red, dashed, inner sep=2pt] (orig2) at (8.25, 2.25) {};
+\node[circle, fill=green!70!black, inner sep=2pt] (test2B) at (7.25, 3.25) {};
 
 \node[] (upper) at (7, 3.48) {};
 
-\draw[blue!70, -{Stealth[length=3mm]}, thick] (test1A) -- (test1B);
-\draw[blue!70, -{Stealth[length=3mm]}, thick] (test2A) -- (test2B);
+\draw[red, -{Stealth[length=3mm]}, dashed] (test1A.east) -- (orig1.east);
+\draw[red, -{Stealth[length=3mm]}, dashed] (test2A.east) -- (orig2.east);
+
+\draw[blue!70, -{Stealth[length=3mm]}, thick] ($(orig1) - (0.1,0.1)$) -- ($(test1B) - (0.1,0.1)$);
+\draw[blue!70, -{Stealth[length=3mm]}, thick] ($(orig2) - (0.1,0.1)$) -- ($(test2B) - (0.1,0.1)$);
 
 \node[draw, fit=(bstart) (bend) (pstart) (pend) (upper), label={ACE}] {};
 
