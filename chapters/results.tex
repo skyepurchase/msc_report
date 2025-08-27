@@ -76,28 +76,53 @@ In particular
 \section{Prompt Pairs}
 \label{sec:prompt-pairs-res}
 
+\subsection{Quantitative Analysis}
+
+\subsubsection{SAE Feature Activation}
+
 \begin{figure}
     \centering
     \captionsetup{width=\textwidth}
-    \includegraphics[width=\textwidth]{figures/gpt2_7_sae.png}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_target.png}
     \caption{
-        The average activation of SAE features for the set of target SAE features and unsteered SAE features.
-        From top to bottom the rows represent CAA \citep{caa}, ACE \citep{ace}, LoReFT \citep{reft} and LoReST \citep{steering-clear}.
+        The average activation of target SAE features at the model completion tokens.
+        This represents how well the adaptor positively changed the models representation, \emph{higher} values are better.
+        The y axis is a log-plot with discontinuity to demonstrate that the baseline model does not activate on the target features.
         The same range of examples is used across all adaptors.
-        The exact SAE feature values are only important in the unsteered case, where they should be 0, or as a comparison within the model parameters.
-    \Sref{sec:prompt-pairs} describes how these metrics are calculated.}
-    \label{fig:gpt-pp-sae}
+    }
+    \label{fig:gpt-pp-target}
 \end{figure}
+
+\begin{figure}
+    \centering
+    \captionsetup{width=\textwidth}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_unrelated.png}
+    \caption{
+        The average activation of unrelated SAE features at the model completion tokens.
+        This represents how well the adaptor did not interfere, \emph{lower} values are better.
+        The y axis is a log-plot with discontinuity to demonstrate that some adaptors .
+        The same range of examples is used across all adaptors.
+    }
+    \label{fig:gpt-pp-unrelated}
+\end{figure}
+
+\subsubsection{The Importance of Rank}
+\label{sec:rank-res}
+
+\subsubsection{Semantic Similarity}
 
 \begin{figure}
     \centering
     \captionsetup{width=.9\textwidth}
     \includegraphics[width=\textwidth]{figures/gpt2_7_similarity.png}
     \caption{
-        The cosine similarity of distilbert \citep{distilbert} word embeddings for the generated token.
+        The cosine similarity of distilbert \citep{distilbert} sentence embeddings for the generated completion.
+        The higher the cosine similarity the better the method has performed.
         The number of steering examples is the same as \Fref{fig:steering-clear} and the cosine similarity is shared across charts.
-        Note that the y axis has been cropped to highlight the difference between models though the change is slight.
     }
     \label{fig:gpt-pp-sim}
 \end{figure}
 
+\subsection{Qualitative Analysis}
+
+\subsection{From and To}
