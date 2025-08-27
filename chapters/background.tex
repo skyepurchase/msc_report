@@ -11,20 +11,21 @@
 
 \section{Notation and Concepts}
 
+Throughout this report ``neural network (NN)'' \Sref{sec:deep-learning} and ``machine learning (ML) model'' are used interchangeably though NNs are a strict subset of ML models.
+In general the term ``model'' is used to refer to the collective group and represents any program that adjusts tunable parameters to predict output from input examples.
+
 Model ``behaviours", in general, are patterns in how the model responds to input.
 This includes the desired behaviour it was trained on (such as classifying images of cats and dogs) but includes patterns in the output that were not explicitly trained for.
 Desired model behaviour is considered ``positive" and undesired model behaviour is considered ``negative".
 Specifically, an example of the desired behaviour is considered a ``positive example'' and an example of undesired or neutral behaviour is considered a ``negative'' example.
 An example of a behaviour generally includes an input-output pairing similar to training examples however they are more specific pairings than would be using during training.
 
-Throughout this report neural network (NN) and machine learning (ML) model are used interchangeably though NNs are a strict subset of ML models.
-In general the term ``model'' is used to refer to the collective group and represents any program that adjusts tunable parameters to predict output from input examples.
-
 When discussing NNs the concept of a ``neuron'' relates to the abstract structure that receives a real-valued, vector input and outputs a real-value scalar based on internal, learnable weights.
 In practice, this is represented by a single element of a NN layer's output vector.
 Furthermore, a \emph{module} refers to a collection of one or more NN layers.
 A model may be made of multiple modules or be a single module.
 Modules may be ``attached'' to specific layers within a model whereby the output of the layer is passed to the module as input and the module may augment, store, or monitor the data flow in the model.
+These ideas are described and discussed in more detail in the deep learning section \Sref{sec:deep-learning}.
 
 Vectors are represented by boldface letters, $\vx, \vy, \vz$, scalars are represented by greek letters, $\alpha, \beta, \gamma$, and matrices are represented by boldface capital letters, $\mA, \mB, \mC$.
 Some matrices may represent transformations or collections of feature vectors, context should disambiguate the two.
@@ -36,6 +37,9 @@ In a multi-layer machine learning model the output of an internal layer is an ``
 A positive activation is denoted $\va^+$ and a negative activation is denoted as $\va^-$. Here, ``positive activation'' means the activation extracted from the model given a positive example as above.
 The mean of a set of activations, $\mathcal{A} = \{\va_i\}_{i < n}$, is denoted $\mu_\mathcal{A} = \frac{1}{n}\sum_{i=1}^{n}\va_i$.
 Frequently the set of set of activations will be the positive activation or negative activation set, in this case the mean is denoted $\mu_{\va^+}$ or $\mu_{\va^-}$ respectively.
+
+\section{Deep Learning}
+\label{sec:deep-learning}
 
 \section{Model Alignment}
 
@@ -113,7 +117,7 @@ Primarily this approach does not consider how much of a behaviour is already pre
 This means the steering parameter does not fully determine the strength of the desired behaviour.
 Furthermore, \citet{steerability} demonstrate that this approach is not robust across behaviours that may be steered along.
 The approach assumes that concepts in activation space are linear which \citet{non-linear-features} show is not universal.
-Techniques such as affine concept editting (ACE) \Sref{ace} use an affine approach to overcome these drawbacks.
+Techniques such as affine concept editting (ACE) \Sref{sec:ace} use an affine approach to overcome these drawbacks.
 
 \subsection{Affine Concept Editting}
 \label{sec:ace}
@@ -330,7 +334,8 @@ This phenomenon has been shown to occur in LLMs and has been demonstrated in toy
 Superposition is the process of NNs representing more features than neurons within the model.
 The features are no longer represented orthogonally in the representation space but instead share components.
 This means that if only one (sparse) feature is active the non-orthogonal features will also be partially active.
-This idea is represented in \Fref{fig:superposition}.
+
+The ideas of polysemanticity and superposition are represented in \Fref{fig:superposition}.
 
 \begin{figure}
     \centering
@@ -354,3 +359,12 @@ It is worth noting that SAEs have been shown to demonstrate subpar performance w
 SAEs are challenging to train and so for the purposes of this project only pretrained SAEs are used.
 \citet{saelens} provides a large collection of open source SAEs with their corresponding models.
 This does limit the analysis as most models only have an SAE for a single layer.
+
+\subsection{Metric Challenges}
+
+As \citet{saes-bad} outline, SAEs do no provide a base truth for how the model represents concepts.
+This means that using SAEs to extract concepts, or in the case of the project, using SAEs to evaluate the success of an adaptor will be imperfect.
+Comparing across SAE features can give an insight into how a steering adaptor changes the models representation but not necessarily \emph{what} that new representation means as a human understandable concept.
+
+The choice of metric is discussed in more detail in \Sref{sec:steering-clear}.
+Inherent challenges with SAEs are not addressed but rather the analysis takes into account their limitations.
