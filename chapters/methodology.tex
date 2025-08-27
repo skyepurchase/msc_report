@@ -6,7 +6,7 @@
 \emph{The specific metrics used to evaluate the steering adaptors are presented with a justification for their use.}
 
 \emph{In the case of the steering clear \citep{steering-clear} reproduction any deviations from the original experiments are explained and justified.}
-\emph{A detailed analysis of the attempts to reproduce steering clear are presented in \Aref{ch:steering-clear} along with additional analysis not important to the main project.}
+\emph{A detailed analysis of the attempts to reproduce steering clear are presented in \Aref{app:steering-clear} along with additional analysis not important to the main project.}
 
 \section{Steering Clear Environment}
 \label{sec:steering-clear}
@@ -61,6 +61,16 @@ The number of steering examples is also varied from $4$ up to $4096$ increasing 
 \smalltitle{Steering metric.} As the model was trained to predict discrete attribute labels and the steering adaptor simply aims for a specific attribute value it is possible to use the models accuracy on the target attributes.
 \citet{steering-clear} use the full target output label, however, this was found to be dominated by unsteered attributes.
 Instead the accuracy on only the steered attribute is used.
+
+\subsection{Hyperparameters}
+
+\smalltitle{CAA, LoReFT, LoReST} use the same hyperparameters as \citet{steering-clear} as they were originally presented in the paper.
+Specifically, CAA uses the hyparparameters $\lambda \in \{1, 2, 3, 5\}$ with both LoReFT and LoReST using ranks in the set $\{1, 2, 3, 5, 10, 20\}$.
+For the low-rank methods 2000 epochs of training using minimum square error and the Adam \cite{adam} optimiser with a learning rate of $0.001$ was used.
+
+ACE was not presented in \citet{steering-clear} however the adaptor behaves similarly to CAA as it is also an affine method.
+Therefore, the same set of values was used with the addition of $10$.
+Specifically the hyperparameters $\alpha \in \{1, 2, 3, 5, 10\}$ are used.
 
 \section{Prompt Pairs Environment}
 \label{sec:prompt-pairs}
@@ -129,3 +139,15 @@ A more complete picture of how the adaptors and models behaved can be achieved b
 Finally, though this project aims to quantitatively analyse the performance of different adaptors on natural language it is important to see the generated completions.
 In all three metrics it is possible for the adaptor to arbitrarily increase the quantitative value resulting in nonsense sentences.
 After the quantitative analysis a selection of generated sentences across the adaptors, hyperparameters, and datasets will be presented and analysed.
+
+\subsection{Hyperparameters}
+
+As the affine methods are agnostic to the dimension of the activations their hyperparameters should remain the same as steering clear \Sref{sec:steering-clear}.
+The hyperparameters are therefore $\lambda \in \{1, 2, 3, 5\}$ for CAA and $\lambda \in \{1, 2, 3, 5, 10\}$ for ACE.
+
+The low-rank methods do, indirectly, rely on the dimension of the activations as they project the activations into a lower dimensional space.
+In the case of GPT-2 \cite{gpt2} the activation dimension is 756 which is exactly triple 256 therefore the new set of ranks should be triple those in \citet{steering-clear}.
+Specifically the values $\{3, 5, 10, 20, 30, 60\}$ are used.
+
+This assumes that the rank of the low-rank adaptor is linked only to the dimension of the activations and not properties such as superposition \Sref{sec:sae}.
+A discussion of this is presented in \Sref{sec:rank-res} where rank values in the set $\{90, 120, 200\}$ are also used.
