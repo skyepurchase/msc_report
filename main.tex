@@ -14,14 +14,6 @@
 
 \bibliographystyle{apalike}
 
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-
-\DeclareMathOperator{\sign}{sign}
-\DeclareMathOperator{\Tr}{Tr}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \title{{ \includegraphics[scale=.5]{figures/ucl_logo.png}}\\
 {{\Huge When Steering Vectors Fail}}\\
 }
@@ -50,6 +42,7 @@ Summarise your report concisely.
 \end{abstract}
 
 \tableofcontents
+\listoffigures
 \clearpage
 \pagenumbering{arabic}
 
@@ -63,7 +56,8 @@ Summarise your report concisely.
 
 \appendix
 
-\include{appendices/gumbel-softmax}
 \include{appendices/prompt-pairs}
+\include{appendices/steering-clear}
+\include{appendices/hyperparameters}
 
 \end{document}
