@@ -15,6 +15,7 @@
 \emph{This provides potential further avenues of research and implications of superposition \Sref{sec:sae} on steering adaptors.}
 
 \section{Steering Clear Reproduction}
+\label{sec:steering-clear-res}
 
 \begin{figure}
     \centering
@@ -67,16 +68,20 @@ This behaviour is matched in \citet{steering-clear}.
 Overall, the results suggest that the analysis by \citet{steering-clear} are sound though an exact replication was not achieved.
 This also suggests some expectations for the prompt pairs environment (described in \Sref{sec:prompt-pairs}).
 In particular
-\begin{itemize}[nolistsep]
+\begin{enumerate}[nolistsep]
     \item Affine methods will perform consistently across the number of examples used, though minor variation may occur.
     \item Low rank methods will increase with the number examples eventually plateauing.
     \item LoReST is likely to achieve the best performance.
-\end{itemize}
+\end{enumerate}
 
 \section{Prompt Pairs}
 \label{sec:prompt-pairs-res}
 
 \subsection{Quantitative Analysis}
+
+The three quantitative metrics discussed in \Sref{sec:prompt-pairs} can be split into two categories: the activation of the SAE features, the semantic similarity of the generated completions.
+As there is no notion of accuracy akin to \citet{steering-clear} the closest comparison comes from the activation of SAE features.
+Though the domains are different the same trends that were seen in \Sref{sec:steering-clear-res} should be seen in this new setting.
 
 \subsubsection{SAE Feature Activation}
 
@@ -87,11 +92,72 @@ In particular
     \caption{
         The average activation of target SAE features at the model completion tokens.
         This represents how well the adaptor positively changed the models representation, \emph{higher} values are better.
-        The y axis is a log-plot with discontinuity to demonstrate that the baseline model does not activate on the target features.
+        The y axis is a symmetric logarithm scale where the range $[0,1]$ is linear, this section is highlighted in grey.
         The same range of examples is used across all adaptors.
     }
     \label{fig:gpt-pp-target}
 \end{figure}
+
+\Fref{fig:gpt-pp-target} presents the results of the first metric, the average activation of the target SAE features.
+As discussed in \Sref{sec:prompt-pairs} the target SAE features are the SAE features that had the highest, average activation across all positive examples.
+For this reason, a successful adaptor should increase the activation of these SAE features from the model with no intervention.
+
+The figure uses a symmetric logarithm plot so that the 4 methods can be compared across the same scale even though their SAE activations are orders of magnitude different.
+The symmetric logarithm is used as the model achieves approximately 0 activation in instances which would cause issues with a standard log plot.
+The linear region of the plot is highlighted in gray and a horizontal grid is provided to demonstrate the difference.
+
+From the figure it is clear that all methods provide some level of improvement regardless of hyperparameter.
+However, the results presented do not precisely follow those of \citet{steering-clear} or the hypotheses suggested in \Sref{sec:steering-clear-res}.
+The primary outliers are affine concept editting (ACE) \citep{ace} and low-rank representation steering (LoReST) \citep{steering-clear}.
+
+\smalltitle{contrastive activation addition (CAA) \citep{caa}} behaves according to the first hypothesis in \Sref{sec:steering-clear-res} and matches the behaviour in the steering clear environment \Sref{sec:steering-clear}.
+There is a clear increase in effectiveness as the hyperparemeter increases and the performance is constant across the number examples with minor fluctuations.
+
+In the case of $\lambda = 5$ the adaptor achieves an average SAE activation of $46.7 \pm 7.8$ across the range of training examples.
+In the case of $\lambda = 1$ the adaptor achieves an average of $1.2 \pm 0.01$.
+This demonstrates a very consistent value across the number of examples regardless of hyperparameter.
+However, the larger the parameter the greater the variance in the exact SAE feature activation.
+
+In comparison to CAA in \citet{steering-clear}, presented in \Fref{fig:steering-clear}, the same behaviour is observed.
+A consistent value across the number of steering examples with a clear threshold above $\lambda = 1$.
+This suggests that in unseen examples the CAA adaptor has to overcompensate and perturb the representation further in representation space than what was learnt.
+
+\smalltitle{affine concept editting (ACE) \citep{ace}} does not behave as expected or in line with the findings presented in \Sref{sec:steering-clear-res}.
+The hyperparameter does not change the target activation significantly and across trained examples the average activation value decreases.
+The method, however, has the highest average target activation by an order of magnitude compared to the next best adaptor.
+This is accompanied by the largest variance across the adaptors, at its best ACE achieves a feature activation of $2187$ but has a standard deviation of $2912$.
+This variance is consistent across the range of training examples.
+The problem of variability across all the adaptors is discussed further in \Sref{sec:variability}.
+
+Given that \citet{ace} demonstrate impressive performance of ACE on Llama 3 \citep{llama3} and the comparable performance of ACE and CAA in \Fref{fig:steering-clear} it is likely that the task, the model or the metric are ill suited to the adaptor.
+The immergent properties present in larger models such as Llama 3 \citep{llama3} and GPT 5 \citep{gpt-5} are not as prominent in the smaller GPT 2 \citep{gpt-2} model.
+It is possible that across positive and negative examples there is not a clear, meaningful baseline from which ACE can consistently steer from.
+This could be due to the completions involving free-text answers that have a range of interpretations that may not align with the desired interpretation.
+\textcolor{red}{Ablation studies into this behaviour have not been carried out ... how easy would it be to do this?}
+
+\smalltitle{Low-rank representation finetuning (LoReFT) \citep{reft}} behaves according to \citet{steering-clear} and the second hypothesis in \Sref{sec:steering-clear-res}. In particular there is a clear increase in target feature activation as the number of examples increases until a threshold point from which the adaptor does not improve.
+
+In the majority of hyperparameter choices the best performance occurred between 128 and 512 examples.
+This does not line up with the predictions of \citet{steering-clear} who found that the point of best performance occurred when the number of examples matched the activation dimension.
+In \Fref{fig:gpt-pp-target} the activation dimension of GPT2 is 756 \citep{saelens} compared to the optimal performance occurring at 128-512 examples.
+
+The key differences between the toy setup and this environment is the added complexity of superposition \Sref{sec:sae}.
+However, this would suggest that superposition \emph{decreases} the number of required examples to successfully steer.
+Another possibility is the rank of the adaptor is too small to accurately steer the model.
+This is supported by the fact that the average feature activation decreases rather than plateaus similar to the small rank examples in \Fref{fig:steering-clear} (see $rank=1, 2$).
+A deeper analysis of the role of the rank is discussed further in \Sref{sec:rank-res}.
+
+LoReFT at its optimal is comparable to CAA achieving an average feature activation of $42.8 \pm 37.2$ in comparison to CAA with $49.3 \pm 26.3$.
+However, in comparison to CAA, LoReFT requires careful tuning of the hyperparameter and the number of examples provided.
+This behaviour is seen both in this realistic environment and the toy environment \Sref{sec:steering-clear-res}.
+
+\smalltitle{Low-rank representation steering (LoReST) \citep{steering-clear}} does not behave as hypothesised in \Sref{sec:prompt-pairs-res} nor follow the trend presented in \citet{steering-clear}.
+In comparison to \Fref{fig:steering-clear} there is no clear increase in the chosen metric as the number of examples increase.
+Furthermore, the optimal rank appears to be $3$ rather than the larger ranks as anticipated.
+Even the optimal rank of $3$ appears to perform worse that CAA with LoReST's average of $1.17 \pm 0.03$ compared to $1.21 \pm 0.01$ for CAA.
+
+From \Fref{fig:steering-clear} it may be expected that the exact rank of LoReST has limited effect on the performance of the adaptor.
+However, the results in \Fref{fig:steering-clear} suggest that there is a hyperparameter threshold above which the adaptor performs similarly \emph{but} higher values are not necessarily better.
 
 \begin{figure}
     \centering
@@ -100,14 +166,22 @@ In particular
     \caption{
         The average activation of unrelated SAE features at the model completion tokens.
         This represents how well the adaptor did not interfere, \emph{lower} values are better.
-        The y axis is a log-plot with discontinuity to demonstrate that some adaptors .
+        The y axis is a symmetric logarithm scale where the range $[0,1]$ is linear, this section is highlighted in grey.
+        This demonstrates that all but ACE achieve 0 interference in some instances.
         The same range of examples is used across all adaptors.
     }
     \label{fig:gpt-pp-unrelated}
 \end{figure}
 
+Unlike the other adaptors presented here LoReST has not be thoroughly applied to large language models (LLMs).
+It is possible that this approach, though based on adaptors such as LoReFT, is not suitable.
+\emph{However}, as demonstrated in both \Fref{fig:gpt-pp-unrelated} and \Sref{sec:qual} the seemingly poor performance of LoReST suggests that feature activation alone is a poor metric for assessing success of a steering adaptor.
+
 \subsubsection{The Importance of Rank}
 \label{sec:rank-res}
+
+\subsubsection{The Issue with Variability}
+\label{sec:variability}
 
 \subsubsection{Semantic Similarity}
 
@@ -124,5 +198,4 @@ In particular
 \end{figure}
 
 \subsection{Qualitative Analysis}
-
-\subsection{From and To}
+\label{sec:qual}
