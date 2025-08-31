@@ -13,9 +13,45 @@
 
 \section{Motivation}
 
+In recent years the use of machine learning (ML) models has rapidly increased across multiple sectors of life.
+In particular the rise in deep learning models following the release of Alexnet \citep{alexnet} has introduced new problems with the use of ML.
+In particular the rapid development in model capabilities \citep{dynabench, gpt-5, grok-4, hle} has been shown to surpass human capabilities in an increasing range of activities.
+With the introduction of large language model (LLM) chatbots starting with ChatGPT \citep{chatgpt}, ML models are increasingly becoming an everyday interaction for the majority of people.
+
+There are already cases of the harmful effects posed on users \citep{c.ai, psychosis} and the potential for humanity scale risk posed by increasingly capable systems has been posed \citep{survellience, deepfakes, disempowerment}.
+There are many approaches to try and solve these problems ranging from law and policy to model training techniques and dataset design.
+
+The general field of preventing risks posed by ML is known as AI (artificial intelligence) safety.
+A promising avenue of AI safety, especially for LLMs, is steering adaptors a subset of representation engineering \citep{steering-taxonomy}.
+There is large amounts of anecdotal evidence with increasing studies looking into the theory \citep{steering-clear, steering-theory} and effectiveness \citep{steerability, steering-taxonomy} of these techniques.
+There, however, continue to be a lack of large scale studies comparing a range of adaptors in realistic settings with varying input size and hyperparameter choice.
+
+This project and report aim to remedy this and provide more quantitative and qualitative analysis of common steering techniques on LLMs.
+The project will hopefully provide insight into the effectiveness of these techniques as well as the suitability of a selection of suggested metrics.
+
 \subsection{Benefits of Steering Vectors}
 
+Unlike other techniques to change a models behaviour such as reinforcement learning \citep{rl, rlhf} or finetuning \citep{lora} steering adaptors require far less compute and data.
+Once implemented they are efficient to run during inference and have been shown to have low impact on model capabilities \citep{steering-wo-ss, sea}.
+Importantly, these techniques are still compatible with other alignment techniques working to provide additional adjustments.
+
+By nature they inherently provide some interpretability by demonstrating how certain model representations effect the output.
+This, in turn, allows for more precise control over model behaviour than other techniques with potential direct feedback between the user and the model behaviour.
+However, these techniques frequently require full access to the models a concept known as \emph{whitebox} models.
+
 \section{Research Questions}
+
+Following from the survey and comparison provided by \citet{steering-taxonomy} and \citet{steerability} this report aims to provide further detailed comparison of steering adaptors in realistic contexts.
+The approach extends the analysis carried out by \citet{steering-clear} in the natural language setting using LLMs, introducing a new adaptor proposed by \citet{ace}.
+The two main research questions therefore focus on reproducing prior results and providing new results and analysis.
+
+\begin{enumerate}
+    \item Are the findings of \citet{steering-clear} reproducible and sound? Where does the adaptor proposed by \citet{ace} fit into their analysis?
+    \item How do the number of examples effect the performance of steering adaptors? Does this match the performance in the toy setting of \citet{steering-clear}? What metrics provide meaningful insight into steering performance?
+\end{enumerate}
+
+Overall this projects aims to provide more insight into when steering methods work focusing on the number of steering examples.
+Additional discussion on the shortcomings of the steering approaches are provided throughout as well as suggestions for real world use.
 
 \section{Compute Environment}
 
