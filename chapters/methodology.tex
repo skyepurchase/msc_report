@@ -146,8 +146,6 @@ As the affine methods are agnostic to the dimension of the activations their hyp
 The hyperparameters are therefore $\lambda \in \{1, 2, 3, 5\}$ for CAA and $\lambda \in \{1, 2, 3, 5, 10\}$ for ACE.
 
 The low-rank methods do, indirectly, rely on the dimension of the activations as they project the activations into a lower dimensional space.
-In the case of GPT-2 \cite{gpt2} the activation dimension is 756 which is exactly triple 256 therefore the new set of ranks should be triple those in \citet{steering-clear}.
+In the case of GPT-2 \cite{gpt-2} the activation dimension is 756 which is exactly triple 256 therefore the new set of ranks should be triple those in \citet{steering-clear}.
 Specifically the values $\{3, 5, 10, 20, 30, 60\}$ are used.
-
 This assumes that the rank of the low-rank adaptor is linked only to the dimension of the activations and not properties such as superposition \Sref{sec:sae}.
-A discussion of this is presented in \Sref{sec:rank-res} where rank values in the set $\{90, 120, 200\}$ are also used.
