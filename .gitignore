@@ -10,3 +10,6 @@
 *.toc
 *.bcf
 *.run.xml
+*.lot
+*.lof
+*.md
