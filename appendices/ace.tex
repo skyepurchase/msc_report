@@ -1,0 +1,60 @@
+\chapter{Choice of ACE Variables}
+\label{app:ace}
+
+\begin{remark}
+    Recall the affine approach to steering from \Eref{eq:ace}
+    \begin{equation*}
+        \va_\text{\normalfont steered} = \va - \text{\normalfont proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
+    \end{equation*}
+    Given a set of positive example activations $\{\va_i^+\}_i$ and negative example activations $\{\va_i^-\}_i$ the appropriate choices for $\va_0$ and $\vr$ are
+    \begin{equation}
+        \label{eq:ace-app}
+        \begin{aligned}
+            \vr = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right) && \alpha_0 = \text{\normalfont proj}_\vr^\parallel\left(\frac{1}{n}\sum_{i=1}^{n}\va_i^-\right)
+        \end{aligned}
+    \end{equation}
+\end{remark}
+\begin{proof}
+    Let $\mu_{\va^+} = \frac{1}{n}\sum_{i=1}^{n}\va_i^+$ be the mean of the positive activations and $\mu_{\va^-}$ the mean of the negative activation.
+    It is safe to assume that $\vr \in \text{span}(\mu_{\va^+} - \mu_{\va^-})$
+
+    When $\alpha = 0$ the expected behaviour of the model should be neutral and when $\alpha = 1$ the expected behaviour should be the target behaviour.
+    Therefore
+    \begin{equation*}
+        \begin{aligned}
+            \mathbb{E}_{\alpha=0}[\va_\text{steered}] &= \mathbb{E}_\text{neutral-behaviour}[\va] = \mu_{\va^-} \\
+            \mathbb{E}_{\alpha=1}[\va_\text{steered}] &= \mathbb{E}_\text{target-behaviour}[\va] = \mu_{\va^+}.
+        \end{aligned}
+    \end{equation*}
+
+    Considering the first equation note that
+    \begin{equation*}
+        \begin{aligned}
+            \mathbb{E}_{\alpha=0}[\va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr] &=  \mathbb{E}[\va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr] = \mu_{\va^-}.
+        \end{aligned}
+    \end{equation*}
+    Taking the projection parallel to $\vr$ to both sides provides a definition for $\alpha_0$
+    \begin{equation*}
+        \begin{aligned}
+            \text{proj}_\vr^{\parallel}(\mathbb{E}[\va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr]) &= \text{proj}_\vr^{\parallel}(\mu_{\va^-}) \\
+            \implies \mathbb{E}[\text{proj}_\vr^{\parallel}(\va) - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\text{proj}_\vr^{\parallel}(\vr)] &= \text{proj}_\vr^{\parallel}(\mu_{\va^-}) \\
+            \implies \alpha_0\vr &= \text{proj}_\vr^{\parallel}(\mu_{\va^-}).
+        \end{aligned}
+    \end{equation*}
+
+    Considering the second equation provides a similar result
+    \begin{equation*}
+        \text{proj}_\vr^{\parallel}(\mathbb{E}[\va - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \vr]) = \alpha_0\vr + \vr = \text{proj}_\vr^{\parallel}(\mu_{\va^+}).
+    \end{equation*}
+
+    Subtracting these results provides a definition for $\vr$
+    \begin{equation*}
+        \vr = \text{proj}_\vr^{\parallel}(\mu_{\va^+}) - \text{proj}_\vr^{\parallel}(\mu_{\va^-}) = \text{proj}_\vr^{\parallel}(\mu_{\va^+} - \mu_{\va^-}).
+    \end{equation*}
+    As $\vr \in \text{span}(\mu_{\va^+} - \mu_{\va^-})$ the tighter bound
+    \begin{equation*}
+        \vr = \mu_{\va^+} - \mu_{\va^-} = \frac{1}{n}\sum_{i=1}^{n}\va_i^+ - \frac{1}{n}\sum_{i=1}^{n}\va_i^- = \frac{1}{n}\sum_{i=1}^{n}(\va_i^+ - \va_i^-)
+    \end{equation*}
+    is found.
+    This leads to the result for $\alpha_0$ and $\vr$ in \Eref{eq:ace-app}.
+\end{proof}

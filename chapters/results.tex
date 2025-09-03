@@ -5,53 +5,49 @@
 \emph{A detailed analysis of the results is included along with references to similar results within the literature.}
 \emph{Both quantitative and qualitative analysis is carried out and the limitations of the metrics used are discussed.}
 
-\emph{First, the reproduction of steering clear \citep{steering-clear} detailed in \Sref{sec:steering-clear} is presented.}
+\emph{First, the reproduction of {\scshape Steering Clear} \citep{steering-clear} detailed in \Sref{sec:steering-clear} is presented.}
 \emph{Comparisons to the original paper are made along with additional analysis.}
 \emph{This provides hypotheses about how the same adaptors will behave in the natural language setting of LLMs \Sref{sec:prompt-pairs}.}
 
 \emph{Finally, the natural language setting described in the methodology chapter \Sref{sec:prompt-pairs} is analysed.}
-\emph{A comparison to the steering clear toy environment is made focusing on the hypotheses proposed.}
+\emph{A comparison to the {\scshape Steering Clear} toy environment is made focusing on the hypotheses proposed.}
 \emph{Additionally, an in depth analysis of the hyperparameter choice in comparison to the toy environment is carried out.}
 \emph{This provides potential further avenues of research and implications of superposition \Sref{sec:sae} on steering adaptors.}
 
-\section{Steering Clear Reproduction}
+\section{{\scshape Steering Clear} Reproduction}
 \label{sec:steering-clear-res}
+
+The results of the reproduction suggest that the analysis by \citet{steering-clear} are sound though an exact replication was not achieved.
 
 \begin{figure}
     \centering
     \captionsetup{width=\textwidth}
-    \includegraphics[width=\textwidth]{figures/steering_clear.png}
+    \includegraphics[width=\textwidth]{figures/steering_clear.pdf}
     \caption{
-        Reproduction of Figure 1 (top-left) in \citet{steering-clear}.
-        Instead of overlaying all the data in a single plot the for methods are separated.
-        ACE \citep{ace} is introduced and MiMiC \citep{mimic} is removed.
-        Though the metric is different, focusing on the steered attribute rather than all attributes, the same trends are presents.
-        The model accuracy is changed to reflect the accuracy of the model without steering rather than the model accuracy on the target input.
+        The average accuracy of the steered model predicting the correct attribute value, in all cases this is $\mu_1$ (see \Sref{sec:steering-clear}).
+        This represents how well the adaptor was able to steer the models output towards the correct value for the given attribute.
+        In contrast to Figure 1 in \citet{steering-clear} only the target attribute is considered in comparison to all attributes.
+        The same trends of consistent performance for affine methods and a clear increase in performance for low-rank methods are present as in \citet{steering-clear}.
     }
     \label{fig:steering-clear}
 \end{figure}
 
-Following the experiment described in \Sref{sec:steering-clear} the results of \cite{steering-clear} are reproduced in \Fref{fig:steering-clear}.
+The results of \cite{steering-clear} are reproduced in \Fref{fig:steering-clear} following the experimental setup in \Sref{sec:steering-clear}.
 There are a few changes from Figure 1 in \cite{steering-clear}, primarily the steering metric focuses on the steered attribute rather than entire output label.
-Furthermore, affine concept editting (ACE) \citep{ace} is added and minimally modified counterfactuals (MiMiC) \citep{mimic} is removed.
-A full discussion of the different metric and why this was used is presented in \Sref{app:steering-clear}.
+Furthermore, ACE is added and minimally modified counterfactuals (MiMiC) \citep{mimic} is removed.
+A full discussion of the different metric and why this was used is presented in \Aref{app:steering-clear}.
 
-\Fref{fig:steering-clear} only represents the upper-left plot in \cite{steering-clear} Figure 1.
-This reproduction aims to verify the method used in \cite{steering-clear} and the results achieved as a stepping stone towards carrying out a similar analysis for large language models (LLMs).
-
-The figure clearly shows a difference between the linear/affine methods of contrastive activation addition (CAA) \citep{caa} \& ACE and the low-rank methods of low-rank representation finetuning (LoReFT) \citep{reft} \& low-rank representation steering (LoReST) \citep{steering-clear}.
+The figure clearly shows a difference between the linear/affine methods of CAA \& ACE and the low-rank methods of LoReFT \& LoReST.
 In the limit of more examples both low-rank methods achieve near 100\% success rate in steering the target attribute to the target value.
-In comparison the affine methods reach an asymptote which does not increase with more training examples.
+In comparison the affine methods reach an asymptote ($\sim 0.8$ for most hyperparameters) which does not increase with more training examples.
 Importantly, in the low training example setting both LoReFT performs worse than both CAA and ACE.
 In fact, it performs worse than the model without steering.
 This is due to the requirement to train parameters which both affine approaches lack.
 However, the addition of parameters allows the method to perform better as more examples are presented.
 This feature of improvement with more examples is shared with LoReST.
 
-Across the methods there is a critical hyperparameter above which the methods perform comparably.
-In the case of CAA (in this environment) this appears to be $\lambda=2$.
-For LoReFT the threshold rank is likely 3 as 2 decreases in accuracy as more examples are introduced.
-Finally with LoReST the rank is clearly 2.
+Across the methods there is a critical hyperparameter value above which the adaptors performance does not significantly improve.
+In the case of CAA this appears to be $\lambda=2$; for LoReFT the threshold rank is likely 3 as 2 decreases in accuracy as more examples are introduced; finally with LoReST the rank is clearly 2.
 ACE behaves differently due to it's design (detailed in \Sref{sec:ace}) where the parameters relate to the strength of the behaviour more directly.
 This is visible in \Fref{fig:steering-clear} as clear bands as the hyperparameter increases; in comparison to the other plots where after a threshold hyperparameter value the adaptors behave similarly.
 
@@ -60,19 +56,10 @@ This distinction is not present in the other methods though this is similar to t
 A possible explanation for this in the case of the affine methods is they do not learn their own representation.
 Instead, with sufficient opposing examples, the difference in steering direction is minimal with more examples.
 
-LoReST in comparison to both LoReFT and the affine examples incorporates both approaches.
-This means in the low data regime it likely behaves closer to ACE and CAA, then when enough data is provided that it can encode the concepts sufficiently the accuracy increases.
-This is supported by the fact that LoReST achieves $\sim 0.8$ with 4 examples matching CAA, LoReST then continues to increase in accuracy following a similar arc to ACE eventually plateauing at the same values as LoReFT.
-This behaviour is matched in \citet{steering-clear}.
-
-Overall, the results suggest that the analysis by \citet{steering-clear} are sound though an exact replication was not achieved.
-This also suggests some expectations for the prompt pairs environment (described in \Sref{sec:prompt-pairs}).
-In particular
-\begin{enumerate}[nolistsep]
-    \item Affine methods will perform consistently across the number of examples used, though minor variation may occur.
-    \item Low rank methods will increase with the number examples eventually plateauing.
-    \item LoReST is likely to achieve the best performance.
-\end{enumerate}
+LoReST in comparison to both LoReFT and the affine methods incorporates both affine steering and low-rank steering.
+This means in the low data regime it behaves closer to ACE and CAA relying on the bias term; when enough data is provided LoReST can encode the concepts sufficiently resulting in an increase in accuracy.
+This is supported by the fact that LoReST achieves an accuracy of $\sim 0.8$ with 4 examples matching CAA, and then LoReST then continues to increase in accuracy eventually plateauing at the same accuracy as LoReFT, $\sim 1.0$.
+This behaviour matches those presented in \citet{steering-clear}.
 
 \section{Prompt Pairs}
 \label{sec:prompt-pairs-res}
@@ -80,16 +67,16 @@ In particular
 \subsection{Quantitative Analysis}
 \label{sec:quant}
 
-The three quantitative metrics discussed in \Sref{sec:prompt-pairs} can be split into two categories: the activation of the SAE features, the semantic similarity of the generated completions.
+Recall the three metrics defined in \Sref{sec:prompt-pairs} of target SAE feature activation, spurious SAE feature activation and semantic similarity.
 As there is no notion of accuracy akin to \citet{steering-clear} the closest comparison comes from the activation of SAE features.
-Though the domains are different the same trends that were seen in \Sref{sec:steering-clear-res} should be seen in this new setting.
+To avoid indiscriminate increase across all SAE features, the spurious SAE features verifies the model only affects the target concepts.
 
 \subsubsection{SAE Target Feature Activation}
 
 \begin{figure}
     \centering
     \captionsetup{width=\textwidth}
-    \includegraphics[width=\textwidth]{figures/gpt2_7_target.png}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_target.pdf}
     \caption{
         The average activation of target SAE features at the model completion tokens.
         This represents how well the adaptor positively changed the models representation, \emph{higher} values are better.
@@ -103,16 +90,17 @@ Though the domains are different the same trends that were seen in \Sref{sec:ste
 As discussed in \Sref{sec:prompt-pairs} the target SAE features are the SAE features that had the highest, average activation across all positive examples.
 For this reason, a successful adaptor should increase the activation of these SAE features from the model with no intervention.
 
-The figure uses a symmetric logarithm plot so that the 4 methods can be compared across the same scale even though their SAE activations are orders of magnitude different.
-The symmetric logarithm is used as the model achieves approximately 0 activation in instances which would cause issues with a standard log plot.
+The figure uses a symmetric logarithmic scale where the range -1 to 1 is linear and all other regions are logarithmic.
+The symmetric logarithmic scale is used as the activations range from 0 exponentially up to 1000 and 0 is not representable on a standard logarithmic scale.
 The linear region of the plot is highlighted in gray and a horizontal grid is provided to demonstrate the difference.
 
-From the figure it is clear that all methods provide some level of improvement regardless of hyperparameter.
-However, the results presented do not precisely follow those of \citet{steering-clear} or the hypotheses suggested in \Sref{sec:steering-clear-res}.
-The primary outliers are affine concept editting (ACE) \citep{ace} and low-rank representation steering (LoReST) \citep{steering-clear}.
+From the figure most methods provide some level of improvement regardless of hyperparameter choice, however, LoReST does not provide a significant improvement compared to the others.
+However, the results presented do not match those those of \citet{steering-clear} where low-rank methods consistently outperform affine methods.
+This demonstrates that though useful insight is gained from the toy setup of \textsc{Steering Clear} this does not lead to predictable results in the natural language setting.
+The primary outliers are ACE and LoReST.
 
-\smalltitle{Contrastive activation addition (CAA) \citep{caa}} behaves according to the first hypothesis in \Sref{sec:steering-clear-res} and matches the behaviour in the steering clear environment \Sref{sec:steering-clear}.
-There is a clear increase in effectiveness as the hyperparameter increases and the performance is constant across the number examples with minor fluctuations.
+\smalltitle{CAA} matches the behaviour in the steering clear environment \Sref{sec:steering-clear}.
+There is a clear increase in effectiveness as the steering magnitude $\lambda$ increases and the performance is constant across the number examples with minor fluctuations.
 
 In the case of $\lambda = 5$ the adaptor achieves an average SAE activation of $46.7 \pm 7.8$ across the range of training examples.
 In the case of $\lambda = 1$ the adaptor achieves an average of $1.2 \pm 0.01$.
@@ -123,7 +111,7 @@ In comparison to CAA in \citet{steering-clear}, presented in \Fref{fig:steering-
 A consistent value across the number of steering examples with a clear threshold above $\lambda = 1$.
 This suggests that in unseen examples the CAA adaptor has to overcompensate and perturb the representation further in representation space than what was learnt.
 
-\smalltitle{Affine concept editting (ACE) \citep{ace}} does not behave as expected or in line with the findings presented in \Sref{sec:steering-clear-res}.
+\smalltitle{ACE} does not behave as expected or in line with the findings presented in \Sref{sec:steering-clear-res}.
 The hyperparameter does not change the target activation significantly and across trained examples the average activation value decreases.
 The method, however, has the highest average target activation by an order of magnitude compared to the next best adaptor.
 This is accompanied by the largest variance across the adaptors, at its best ACE achieves a feature activation of $2187$ but has a standard deviation of $2912$.
@@ -131,16 +119,16 @@ This variance is consistent across the range of training examples.
 The problem of variability across all the adaptors is discussed further in \Sref{sec:variability}.
 
 Given that \citet{ace} demonstrate impressive performance of ACE on Llama 3 \citep{llama3} and the comparable performance of ACE and CAA in \Fref{fig:steering-clear} it is likely that the task, the model or the metric are ill suited to the adaptor.
-The immergent properties present in larger models such as Llama 3 \citep{llama3} and GPT 5 \citep{gpt-5} are not as prominent in the smaller GPT 2 \citep{gpt-2} model.
+The emergent properties present in larger models such as Llama 3 \citep{llama3} and GPT 5 \citep{gpt-5} are not as prominent in the smaller GPT 2 \citep{gpt-2} model.
 It is possible that across positive and negative examples there is not a clear, meaningful baseline from which ACE can consistently steer from.
 This could be due to the completions involving free-text answers that have a range of interpretations that may not align with the desired interpretation.
-\textcolor{red}{Ablation studies into this behaviour have not been carried out ... how easy would it be to do this?}
 
-\smalltitle{Low-rank representation finetuning (LoReFT) \citep{reft}} behaves according to \citet{steering-clear} and the second hypothesis in \Sref{sec:steering-clear-res}. In particular there is a clear increase in target feature activation as the number of examples increases until a threshold point from which the adaptor does not improve.
+\smalltitle{LoReFT} behaves according to \citet{steering-clear}.
+In particular there is a clear increase in target feature activation as the number of examples increases until a threshold point from which the adaptor does not improve.
 
 In the majority of hyperparameter choices the best performance occurred between 128 and 512 examples.
 This does not line up with the predictions of \citet{steering-clear} who found that the point of best performance occurred when the number of examples matched the activation dimension.
-In \Fref{fig:gpt-pp-target} the activation dimension of GPT2 is 756 \citep{saelens} compared to the optimal performance occurring at 128-512 examples.
+In \Fref{fig:gpt-pp-target} the activation dimension of GPT-2 is 756 \citep{saelens} compared to the optimal performance occurring at 128-512 examples.
 
 The key differences between the toy setup and this environment is the added complexity of superposition \Sref{sec:sae}.
 However, this would suggest that superposition \emph{decreases} the number of required examples to successfully steer.
@@ -151,7 +139,7 @@ LoReFT at its optimal is comparable to CAA achieving an average feature activati
 However, in comparison to CAA, LoReFT requires careful tuning of the hyperparameter and the number of examples provided.
 This behaviour is seen both in this realistic environment and the toy environment \Sref{sec:steering-clear-res}.
 
-\smalltitle{Low-rank representation steering (LoReST) \citep{steering-clear}} does not behave as hypothesised in \Sref{sec:prompt-pairs-res} nor follow the trend presented in \citet{steering-clear}.
+\smalltitle{LoReST} does not follow the trend presented in \citet{steering-clear}.
 In comparison to \Fref{fig:steering-clear} there is no clear increase in the chosen metric as the number of examples increase.
 Furthermore, the optimal rank appears to be $3$ rather than the larger ranks as anticipated.
 Even the optimal rank of $3$ appears to perform worse that CAA with LoReST's average of $1.17 \pm 0.03$ compared to $1.21 \pm 0.01$ for CAA.
@@ -162,7 +150,7 @@ However, the results in \Fref{fig:steering-clear} suggest that there is a hyperp
 \begin{figure}
     \centering
     \captionsetup{width=\textwidth}
-    \includegraphics[width=\textwidth]{figures/gpt2_7_unrelated.png}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_unrelated.pdf}
     \caption{
         The average activation of unrelated SAE features at the model completion tokens.
         This represents how well the adaptor did not interfere, \emph{lower} values are better.
@@ -182,7 +170,7 @@ It is possible that this approach, though based on adaptors such as LoReFT, is n
 \Fref{fig:gpt-pp-unrelated} presents the results of the second metric, the average activation of the spurious SAE features.
 As discussed in \Sref{sec:prompt-pairs} the spurious SAE features are the SAE features that where not activated in either the positive or negative examples.
 These features represent concepts that are, in theory, unrelated to concepts represented across the example prompts.
-Only a random sample is considered rather than the entirity of spurious features which is usually fairly large.
+Only a random sample is considered rather than the entirety of spurious features which is usually fairly large.
 For this reason, a successful adaptor should not activate any of these features resulting in an average of 0, in general a low or decreasing average activation is expected.
 
 Following \Fref{fig:gpt-pp-target} the figure uses a symmetric log plot with the same linear region highlighted.
@@ -254,25 +242,24 @@ Overall considering the results presented it is not clear that the proposed adap
 \begin{figure}
     \centering
     \captionsetup{width=.9\textwidth}
-    \includegraphics[width=\textwidth]{figures/gpt2_7_similarity.png}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_similarity.pdf}
     \caption{
-        The cosine similarity of distilbert \citep{distilbert} sentence embeddings for the generated completion.
+        The cosine similarity of Distilbert \citep{distilbert} sentence embeddings for the generated completion.
         The higher the cosine similarity the better the method has performed.
         The number of steering examples is the same as \Fref{fig:steering-clear} and the cosine similarity is shared across charts.
     }
     \label{fig:gpt-pp-sim} \end{figure}
 
 The final metric discussed in \Sref{sec:prompt-pairs} is semantic similarity which is presented in \Fref{fig:gpt-pp-sim}.
-As discussed in \Sref{sec:prompt-pairs} the semantic similarity is calculated by embedding the target and generated completion using distilbert \citep{distilbert} and taking the cosine similarity between the two vectors.
+As discussed in \Sref{sec:prompt-pairs} the semantic similarity is calculated by embedding the target and generated completion using Distilbert \citep{distilbert} and taking the cosine similarity between the two vectors.
 A successful adaptor will have a larger semantic similarity with 1 being a perfect match.
 
-The the shaded regions in \Fref{fig:gpt-pp-sim} represent one standard deviation across the 5 datasets that were used.
+The shaded regions in \Fref{fig:gpt-pp-sim} represent one standard deviation across the 5 datasets that were used.
 The same baseline data is used across all 4 plots.
 As with \Fref{fig:gpt-pp-target} all adaptors show some level of improvement above the baseline method.
 
 \smalltitle{CAA} continues to present the same behaviour seen in the previous two metrics.
 As the hyperparameter value increases the semantic similarity increases.
-As hypothesised in \Sref{sec:steering-clear-res} the performance of CAA is consistent across the number of training examples.
 
 The best semantic similarity is achieved by $\lambda = 5$ with $0.66 \pm 0.12$ and in the worst case the adaptor still achieves $0.51 \pm 0.05$ a slight improvement over the baseline at $0.48 \pm 0.05$.
 Based on the performance in previous metrics this is the expected result for CAA.
@@ -313,28 +300,28 @@ Across all steering example sets $rank = 60$ achieves an average similarity scor
 
 Overall the three metrics suggest that CAA performs the best across possible training set sizes.
 Though it suffers from high variance this is as good if not better than the variance of other adaptors.
-LoReFT performs comparably but requires tuning hyperparameters and insuring sufficient training examples are provided.
+LoReFT performs comparably but requires tuning hyperparameters and ensuring sufficient training examples are provided.
 
 \subsection{Qualitative Analysis}
 \label{sec:qual}
 
 The quantitative metrics analysed in \Sref{sec:quant} are useful as a objective comparison across the adaptors, hyperparameters, and number of steering examples.
-However, as the environment is based on natural language it is important to analyse the sentences produced by the different techniques.
+However, as the environment is based on natural language it is important to analyse the sentences produced as this is the primary output of the LLM.
 Along with the analysis in \Sref{sec:quant} this will provide a full analysis of the performance of the techniques.
 
 The completions generated by the model with the various adaptors is presented as a \emph{prompt-response} dialogue.
-The formatting for these is based on \cites{mwe} dialogue's.
+The formatting for these are based on \cites{mwe} dialogues.
 For each prompt a range of responses is included across a range of steering examples and hyperparameters.
 The same selection of prompts is used across the different tables to provide a consistent comparison across the adaptors.
 The specific completions are randomly selected for each adaptor with certain random selections discarded due to their not safe for work nature.
 
 \input{chapters/dialogues/baseline}
 
-\Tref{tab:baseline} presents a selection of completions generated by GPT2 \citep{gpt-2} without any steering adaptor intervention.
+\Tref{tab:baseline} presents a selection of completions generated by GPT-2 \citep{gpt-2} without any steering adaptor intervention.
 This provides a baseline to analyse the following dialogues against.
 
 The model demonstrates reasonable completion ability with the majority of the sentences making grammatical sense.
-Though occasionally there are non-existant words such as ``verness'' the vast majority of words are true English words.
+Though occasionally there are nonexistent words, such as ``verness'', the vast majority of words are existent English.
 Furthermore, the completions do not rely heavily on the provided context with frequent deviations especially if a second clause is generated.
 This demonstrates an inherent problem with GPT-2 when trying to steer the model.
 However, with this limitation in mind, it is possible to compare the different adaptors against each other.
@@ -344,13 +331,15 @@ However, with this limitation in mind, it is possible to compare the different a
 \input{chapters/dialogues/caa}
 
 \Tref{tab:caa} presents the selection of completions generated by GPT-2 with CAA \citep{caa}.
+Given the low cost of implementing CAA it produces occasionally coherent sentences.
+The output does lack grammatical form but for short word responses CAA would be a viable adaptor.
 
 Recall that as the hyperparameter increased in value Figures \ref{fig:gpt-pp-target} and \ref{fig:gpt-pp-sim} suggest that CAA improves the completion towards the target concept.
 This is achieved with minimal spurious SAE feature activation.
 This would suggest that CAA produces coherent sentences that match the target concept.
 
-The table presents a different picture with entirely nonsense completions produced.
-Though GPT-2 is partially to blame as it \textcolor{red}{WHAT YOU TRYING TO SAY} it is clear that this adaptor negatively effects the models ability to produce coherent sentences.
+The table presents a different picture with primarily ungrammatical completions produced.
+Though GPT-2 is partially to blame, as it is prone to repeat tokens, it is clear that this adaptor negatively effects the models ability to produce coherent sentences.
 
 In the case of $\lambda = 1$ the adaptor does not effect the models completion ability, producing grammatically meaningful sentences.
 However, we see in the \emph{Disapproval $\to$ Approval} case the continued use of ``vernacular'' also present in \Tref{tab:baseline}.
@@ -372,15 +361,15 @@ Interestingly, CAA does not produce the target words of ``criminal'', ``gang'', 
 
 \Tref{tab:ace} presents the selection of completions generated by GPT-2 with ACE \citep{ace}.
 According to the analysis in \Sref{sec:quant} ACE should perform the best given how large the target SAE feature activation could be.
-Instead, the method performs the worst when considering the model output.
+Instead, the method performs the worst producing completely nonsensical sentences filled primarily with punctuation and conjunctions.
 
 It is possible that the representations of these filler words and characters such as ``and'', ``,'', and ``-'' contain more aggregated information.
-For this reason the adaptor boosts the occurence of these filler words that internally contain large amounts of context relating to the target phrase.
+For this reason the adaptor boosts the occurrence of these filler words that internally contain large amounts of context relating to the target phrase.
 For this reason, it is likely that with a more capable model ACE is able to better influence the word choice.
 
 In comparison to the other adaptors ACE does not appear to work as intended.
 As mentioned in \Sref{sec:quant} this goes against the expectations from \citet{ace} and the results in \Sref{sec:steering-clear-res}.
-Using larger models such as those in \citet{ace} may produce better performance and in fact out perform the other adaptors presented here.
+Using larger models such Llama 3 \citep{llama3} used in \citet{ace} may produce better performance and thus outperform the other adaptors presented here.
 Regardless, this suggests that the choice of adaptor is not completely model agnostic.
 
 \smalltitle{LoReFT}
@@ -400,25 +389,27 @@ Interestingly, the adaptor appears to prefer the \emph{negative} concept with mo
 Across both sampled datasets the lowest rank appears to complete the task best.
 There is, however, still a lot of repetition, nonsense words, and incorrect grammar.
 These may be caused by the same issues that were present with ACE and the shortcomings of GPT 2.
-However, there is still demonstration of improvement compared to the affine methods even though the quantitative methods do not exhibit this.
+However, the adaptor produces sentences closer to English sentences than the affine methods with only occasional nonsense words.
+This goes against what the quantitative results in \Sref{sec:quant} suggest, where the adaptor achieved SAE feature activations less than those of the affine methods.
 
 \smalltitle{LoReST}
 
 \input{chapters/dialogues/lorest}
 
 \Tref{tab:lorest} presents the selection of completions generated by GPT-2 with LoReST \citep{steering-clear}.
-The analysis in \Sref{sec:quant} suggests poor performance across different hyperparameters and example sets.
-Furthermore, the poor performance in \Fref{fig:gpt-pp-sim} suggests that the sentences may not match the target phrases.
+The analysis in \Sref{sec:quant} suggested LoReST was unable to successfully steer the models internal representation or produce sentences that achieved a high semantic similarity score.
+However, the low, near-zero activation values in \Fref{fig:gpt-pp-unrelated} suggest that the adaptor maintained the relevant context.
+The low semantic similarity scores suggest that the steered model produced phrases that were not related to the target phrases desired.
+In contrast, \Tref{tab:lorest} demonstrates improved performance, qualitatively, against the other adaptors producing sentences which are grammatically sensible and demonstrate accurate steering.
 
-Though lacking grammatical structures like all the other adaptors the results demonstrate the shortcomings of the quantitative metrics.
-Unlike the other methods all the sampled sentences give an impression of English sentences.
+All the sampled sentences give an impression of English sentences, unlike the previous adaptors.
 Furthermore, in the case of $rank = 3$, it produces sentences that match the target concept.
 It is the only adaptor that successfully manages to steer the model towards approval in \emph{Disapproval $\to$ Approval} consistently across the different hyperparameters and example sets.
 
 The same problems of repetition are still present however this time the repetition is frequently of the target concept.
 This can be seen in \emph{Law enforcement $\to$ Criminal} where ``crime'' is repeated, though ``police'' is also repeated.
-However, the issue of nonsense words is clearly reduced with interesting occurences of seemingly German and French words.
+However, the issue of nonsense words is clearly reduced with interesting occurrences of seemingly German and French words.
 
-There are interesting ``oxymorons'' such as ``gang police officers'' and ``\emph{concur} on a final decision. We \emph{disagree}''.
+There are interesting oxymorons such as ``gang police officers'' and ``\emph{concur} on a final decision. We \emph{disagree}''.
 This suggests that the concept as a whole has been accurately represented but the exact direction may not have been codified.
-It is likely that with a larger set of positive and negative examples the adaptor would be able to perform better.
+However, it is also important to not force models to completely ignore phrases related to the ``negative'' behaviour.

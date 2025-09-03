@@ -12,14 +12,14 @@
 
 \section{Limitations}
 
-The primary limitation of the project is using GPT-2 which has a limited context window and ability for high-level reasoning.
-This means that the results of this project will not necessarily scale to modern LLMs such as Gemma, GPT-4, Llama-3, etc.
+The primary limitation of the project is the compute cost and time which necessitated using GPT-2 which has a limited ability for high-level reasoning.
+This means that the results of this project will not necessarily scale to modern LLMs such as Gemma \citep{gemma}, GPT-4 \citep{gpt-4}, Llama-3 \citep{llama3}, etc.
 Though the results do demonstrate how steering adaptors behave in a natural language setting there is still more work to be done on quantitative analysis of steering adaptors.
 
 Further limitations include the adaptors chosen.
-The adaptors presented in this work are chosen to represent a range of steering adaptors currently proposed, however, there are many more techniques that would behave differently.
+The adaptors presented in this work are chosen to represent a range of steering adaptors currently proposed, however, there are many more adaptors.
 Clear examples include minimally modified counterfactuals \citep{mimic} which was used in \citet{steering-clear} and probes \citep{probes}.
-This project already demonstrates the wide performance range of the few commonly used adaptors, analysing the performance of more adaptors would give a better overview of represenation engineering as a whole.
+This project already demonstrates the wide performance range of the few commonly used adaptors, analysing the performance of more adaptors would give a better overview of representation engineering as a whole.
 
 Finally the datasets used are small, both in the number of examples and in the number of distinct sets.
 Only 5 different sets were used to generate the results in \Sref{sec:prompt-pairs-res} each with at most 3000 unique prompts.
@@ -27,3 +27,21 @@ This fails to completely capture the full range of representations that the mode
 Considering that the sparse autoencoder dimension for GPT-2 is 24576 \citep{saelens} 5 datasets are unlikely to encompass all concepts present in the model representation.
 
 \section{Future Work}
+
+Using a larger model such as Gemma \citep{gemma}, Llama 3 \citep{llama3} or GPT-5 \citep{gpt-5} (all of which have over 7 billion parameters compared to GPT-2 with 1.5 billion \citep{gpt2-1.5}) which have been instruction tuned would provide more real-world applicable results.
+These models have also shown to perform far better than GPT-2 on text completion and knowledge acquisition.
+With more compute it would be possible to extend the experiments in this project to these larger models.
+This will also provide better analysis of affine concept editing \citep[ACE]{ace} as this method was originally developed for models such as Llama 3.
+
+Expanding the datasets to include specific concerning behaviour present in large models (e.g. sycophancy, harmful suggestions, desire to gain more power) would provide a deeper insight into how well these adaptors may be used in practice.
+Datasets such as the model written evaluations \citep[MWE]{mwe} provide a large corpus of such datasets, however, these rely on simple multiple choice questions (MCQs).
+The argument for MCQs is that the possible answer tokens (``A'', ``B'' or ``yes'', ``no'') contain the full context of the question being asked \citep{steering-taxonomy}.
+Potentially utilising a mixture of MCQs and free text answers can provide more insight into how best to implement steering adaptors.
+
+Given the problems of superposition \Sref{sec:sae} that are inherent in large language models it is possible that the number of examples required to effectively steer models is larger than those presented here.
+Datasets such as MWE contain only $\sim 1000$ examples and in some cases provide enough examples to effectively steer concepts \citep{steerability}.
+Regardless, expanding the number of examples may provide further insight into the claims of \citet{steering-clear} about the embedding dimension, density of concepts, and number of required steering examples.
+
+Experiments looking into the effect of the positive and negative examples would also provide more insight into the ideal choice of adaptor.
+In the case of low rank methods which require explicit training it is likely that positive and negative examples need to be closely linked.
+In the affine cases it may be possible to only provide positive examples to steer towards, or negative examples to steer away from.

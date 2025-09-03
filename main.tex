@@ -1,9 +1,10 @@
-\documentclass[tikz, ]{report}
+\documentclass[tikz, 12pt]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=20mm]{geometry}
 \usepackage[pdfborder={0 0 0},backref=page]{hyperref}
 \usepackage{dissertation}
 \usepackage{lineno}
+\linespread{1.5}
 
 \hypersetup{
     colorlinks=true,
@@ -15,10 +16,10 @@
 \bibliographystyle{apalike}
 
 \title{{ \includegraphics[scale=.5]{figures/ucl_logo.png}}\\
-{{\Huge Size Matters: The Effect of Sample Size on Steering}}\\
+{{\Huge Does Size Matter?}\\{\Large The Effect of Sample Size on Steering}}\\
 }
 \date{Submission date: 8 September 2025}
-\author{Skye Purchase\thanks{
+\author{PRHC8\thanks{
 {\bf Disclaimer:}
 This report is submitted as part requirement for the Machine Learning MSc at UCL. It is
 substantially the result of my own work except where explicitly indicated in the text.
@@ -30,6 +31,7 @@ Daniel Tan \& Brooks Paige}
 \begin{document}
 \linenumbers
 
+%TC:ignore
 \include{math_commands}
 \include{metadata}
 
@@ -37,6 +39,18 @@ Daniel Tan \& Brooks Paige}
 
 \onehalfspacing
 \maketitle
+
+\chapter*{Acknowledgements}
+
+I want to thank my family, especially my mum and dad who have supported me throughout my life and encouraged me to explore the world.
+To my wider family who have both directly and indirectly supported me throughout the masters.
+
+Particular thanks goes to Mia who has supported me throughout the highs and lows, stress and anxiety of the masters and the year leading up to it.
+Thank you for listening to my endless rambles about the project and all the other projects I've had; keeping me focused, motivated, and on track to complete the thesis.
+
+I would like to thank my supervisor Daniel Tan and the support of the ML Alignment and Theory Scholars London office for guiding the project and providing feedback along the way.
+Additionally, to Alex for providing detailed, actionable feedback on my early rough drafts.
+
 \begin{abstract}
 Summarise your report concisely.
 \end{abstract}
@@ -46,6 +60,7 @@ Summarise your report concisely.
 \listoftables
 \clearpage
 \pagenumbering{arabic}
+%TC:endignore
 
 \include{chapters/introduction}
 \include{chapters/background}
@@ -53,12 +68,15 @@ Summarise your report concisely.
 \include{chapters/results}
 \include{chapters/conclusion}
 
+%TC:ignore
 \bibliography{references}
 
 \appendix
 
+\include{appendices/ace}
 \include{appendices/prompt-pairs}
 \include{appendices/steering-clear}
 \include{appendices/hyperparameters}
+%TC:endignore
 
 \end{document}

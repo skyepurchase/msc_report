@@ -60,7 +60,7 @@
     \draw[thick, ->, >=stealth] (layer5.north) -- (layer6.south);
     \draw[thick, ->, >=stealth] (layer6.north) -- ++(0,0.5);
 
-    % Draw SAE
+    % Draw Adaptor
     % Draw nodes
     \node[
         draw,
@@ -160,7 +160,7 @@
         minimum width=1.5cm,
         rounded corners,
         inner ysep=0.2cm,
-        below = of W,
+        left = 1.5cm of input,
     ] (input2) {};
     \node[
         draw,
@@ -289,9 +289,7 @@
         -- ($(input.south) + (0,-0.3)$)
         -- (input.south);
     \draw[thick, ->, >=stealth]
-        ($(layer3.north) !0.4! (layer4.south)$)
-        -- ++(-1.5,0)
-        -- ($(input.south east) + (0.75,-0.3)$)
+        ($(input.south) + (0,-0.3)$)
         -- ($(input2.south) + (0,-0.3)$)
         -- (input2.south);
     \draw[thick, ->, >=stealth]

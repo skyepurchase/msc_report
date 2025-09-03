@@ -15,15 +15,20 @@
 
 In recent years the use of machine learning (ML) models has rapidly increased across multiple sectors of life.
 In particular the rise in deep learning models following the release of Alexnet \citep{alexnet} has introduced new problems with the use of ML.
-In particular the rapid development in model capabilities \citep{dynabench, gpt-5, grok-4, hle} has been shown to surpass human capabilities in an increasing range of activities.
-With the introduction of large language model (LLM) chatbots starting with ChatGPT \citep{chatgpt}, ML models are increasingly becoming an everyday interaction for the majority of people.
+This has lead to rapid development in field resulting  model capabilities surpassing human capabilities in an increasing range of activities \citep{dynabench, gpt-5, grok-4, hle}.
+With the introduction of large language model (LLM) chatbots starting with ChatGPT \citep{chatgpt}, ML models are increasingly becoming part of everyday life.
 
-There are already cases of the harmful effects posed on users \citep{c.ai, psychosis} and the potential for humanity scale risk posed by increasingly capable systems has been posed \citep{survellience, deepfakes, disempowerment}.
+There are already cases of serious harm to users \citep{c.ai, psychosis} and the potential for humanity scale risk posed by increasingly capable systems has been posed \citep{survellience, deepfakes, disempowerment}.
 There are many approaches to try and solve these problems ranging from law and policy to model training techniques and dataset design.
 
-The general field of preventing risks posed by ML is known as AI (artificial intelligence) safety.
-A promising avenue of AI safety, especially for LLMs, is steering adaptors a subset of representation engineering \citep{steering-taxonomy}.
-There is large amounts of anecdotal evidence with increasing studies looking into the theory \citep{steering-clear, steering-theory} and effectiveness \citep{steerability, steering-taxonomy} of these techniques.
+The field of preventing risks posed by ML is known as AI (artificial intelligence) safety.
+\textbf{A primary goal of AI safety is to alter models to be more ``helpful'', ``honest'', and ``harmless'' without effecting their performance}.
+A promising avenue of AI safety, especially for LLMs, is \emph{steering adaptors} a subset of representation engineering \citep{steering-taxonomy}.
+The basic concept behind steering adaptors is to \emph{manipulate the internal representation space} of models.
+By assuming certain \emph{directions within representation space represent understandable concepts} it is possible to perturb a models vector representation towards a target concept.
+This idea has already been demonstrated by \citet{word2vec} in word embedding models.
+
+There is large amounts of anecdotal evidence of steering adaptors successfully changing model behaviour with increasing studies looking into the theory \citep{steering-clear, steering-theory} and effectiveness \citep{steerability, steering-taxonomy} of steering adaptors on modern models.
 There, however, continue to be a lack of large scale studies comparing a range of adaptors in realistic settings with varying input size and hyperparameter choice.
 
 This project and report aim to remedy this and provide more quantitative and qualitative analysis of common steering techniques on LLMs.
@@ -31,23 +36,27 @@ The project will hopefully provide insight into the effectiveness of these techn
 
 \subsection{Benefits of Steering Vectors}
 
-Unlike other techniques to change a models behaviour such as reinforcement learning \citep{rl, rlhf} or finetuning \citep{lora} steering adaptors require far less compute and data.
+Unlike other techniques to change a models behaviour such as reinforcement learning \citep{rl, rlhf} or finetuning \citep{lora} steering adaptors require far less compute and data as they do not require changing the many parameters of the chosen model.
 Once implemented they are efficient to run during inference and have been shown to have low impact on model capabilities \citep{steering-wo-ss, sea}.
 Importantly, these techniques are still compatible with other alignment techniques working to provide additional adjustments.
 
 By nature they inherently provide some interpretability by demonstrating how certain model representations effect the output.
 This, in turn, allows for more precise control over model behaviour than other techniques with potential direct feedback between the user and the model behaviour.
-However, these techniques frequently require full access to the models a concept known as \emph{whitebox} models.
+However, these techniques frequently require full access to the model's parameters and architecture.
 
 \section{Research Questions}
+\label{sec:questions}
 
-Following from the survey and comparison provided by \citet{steering-taxonomy} and \citet{steerability} this report aims to provide further detailed comparison of steering adaptors in realistic contexts.
-The approach extends the analysis carried out by \citet{steering-clear} in the natural language setting using LLMs, introducing a new adaptor proposed by \citet{ace}.
-The two main research questions therefore focus on reproducing prior results and providing new results and analysis.
+This project aims to provide a detailed, quantitative comparison of steering adaptors in realistic settings.
+This work follows the work on analysing the generalisability of steering vectors in \citet{steerability} and the survey of current representation engineering techniques from \citet{steering-taxonomy}.
+The approach used in this project extends the analysis of steering example size on adaptor performance in the toy setting proposed by \citet{steering-clear} to the natural language setting using LLMs.
+Furthermore, a comparison of the new affine concept editing \citep[ACE]{ace} adaptor is made against existing adaptors.
+The three research questions therefore focus on reproducing prior results and providing new results and analysis.
 
-\begin{enumerate}
+\begin{enumerate}[nolistsep]
     \item Are the findings of \citet{steering-clear} reproducible and sound? Where does the adaptor proposed by \citet{ace} fit into their analysis?
-    \item How do the number of examples effect the performance of steering adaptors? Does this match the performance in the toy setting of \citet{steering-clear}? What metrics provide meaningful insight into steering performance?
+    \item How do the number of examples effect the performance of steering adaptors? Does this match the results in the toy setting of \citet{steering-clear}? What metrics provide meaningful insight into steering performance?
+    \item How can the success of steering adaptors be quantified in the natural language setting?
 \end{enumerate}
 
 Overall this projects aims to provide more insight into when steering methods work focusing on the number of steering examples.
@@ -56,15 +65,15 @@ Additional discussion on the shortcomings of the steering approaches are provide
 \section{Compute Environment}
 
 The project was written and programmed on my personal laptop.
-This is a Dell Inspiron 15'' laptop running Arch linux and i3 window manager.
+This is a Dell Inspiron 15'' laptop running Arch Linux and i3 window manager.
 The laptop has 16GB of memory with an 8 core Intel 13$^{th}$ generation i7 processor.
 
 Preliminary tests of the experiments run in this project were done on this laptop.
 However, the official results were run on \href{https://www.runpod.io/}{RunPod}, which provides a suite of possible GPU environments.
 For all the results presented in \Sref{ch:results} the RTX 2000 Ada environment was used.
 This environment includes a single RTX 2000 Ada GPU with 16GB of VRAM, 31GB of RAM, and 6 virtual CPUs.
-The cost to run this enivornment was \$0.24 per hour.
-The funding for the compute environment was provided by my supervisor through the ML Alignment and Theory Scholarship \citep{mats} which he is part of.
+The cost to run this environment was \$0.24 per hour.
+The funding for the compute environment was provided by my supervisor through the \href{https://www.matsprogram.org/}{ML Alignment and Theory Scholarship} which he is part of.
 
 Occasional use of the free \href{https://colab.research.google.com/}{Google Colab} environment was used to verify the experiments ran at scale.
 No results presented in this report were generated from these runs.
@@ -76,7 +85,7 @@ This project aims to steer generative AI models (genAI) such as GPT 2 \citep{gpt
 However, outside of the direct prompting of agents to analyse the steering adaptors presented in \Sref{ch:background}, no generative AI was used throughout the project or report.
 There are two exceptions:
 \begin{itemize}[nolistsep]
-    \item Generating a dataset of prompt-completion templates detailed in \Sref{sec:pp-dataset}.
+    \item Generating a dataset of prompt-completion templates detailed in \Aref{app:prompt-pairs}.
     \item Generating a random point cloud in Tikz for \Fref{fig:caa}.
 \end{itemize}
 
@@ -84,50 +93,62 @@ Spellcheck was performed by Neovim and its built in spellchecker with no use of 
 All citations were found and generated through Google Scholar.
 Assistance for Tikz diagrams was found through \href{https://www.tikz.dev}{https://www.tikz.dev}.
 
-However, with the proliferation of AI in search engines it is not possible to state that genAI did not influence any of the \LaTeX or code snippets.
+However, with the proliferation of AI in search engines it is not possible to state that genAI did not influence any of the \LaTeX~or code snippets.
 I endeavoured to not use genAI as much as possible throughout the last 3 months.
 
 \section{Related Work}
 
 \smalltitle{\citet{steering-clear}}
 aim to analyse steering in a toy environment where they are able to control the representation density within the model.
-They compare a range of steering techniques \citep{caa, reft, mimic} against each other in a controlled setting to evaluate the benefits and drawbacks of each approach.
-Inspired by LoReFT \citep{reft} they introduce their own technique LoReST and demonstrate competitive performance to the other techniques.
+They compare a range of steering techniques \citep{caa, reft, mimic} against each other in a controlled setting to focus on the effect of steering example size.
+Inspired by the low-rank representation finetuning \citep[LoReFT]{reft} (A steering adaptor which steers representations in a projected, low-rank space) they introduce their own technique, low-rank representation steering (LoReST), and demonstrate competitive performance to the other techniques.
 
-This project reproduces a sample of plots from Figure 1 using the same toy setup described in \Sref{sec:steering-clear}.
-In addition to the techniques used in the original paper the reproduction also analyses the behaviour of \citet{ace}.
-
-This project aims to expand the analysis carried out by \citet{steering-clear} to reproduce the same effects in large language model systems.
-Additionally, the relationship between the negative and positive training examples is analysed to gain a better insight as to when steering approaches fail.
+To verify this work, this thesis reproduces the same toy environment described in \Sref{sec:steering-clear} and validates the conclusions drawn.
+Additionally, this reproduction introduces the affine concept editing adaptor proposed by \citet{ace} to compare against the adaptors used in \citet{steering-clear}.
+This thesis then expands the analysis to LLMs and demonstrates similar adaptor performance in relation to the number of training examples suggesting the same preference for low-rank methods in the large data regime and affine methods in the small data regime.
+Furthermore, this thesis shows the consistency of LoReST in both data regimes.
 
 \smalltitle{\citet{steerability}}
-aim to analyse the generalisation of steering vectors across a range of steering datasets.
-They analyse the variability of success and introduce the notion of steerability.
+analyse the generalisation of steering vectors across a range of steering datasets.
+They analyse the variability of success and introduce the notion of ``steerability''.
 Using this notion they demonstrate that many techniques fail to generalise on certain datasets both in and out of distribution.
 
 The analysis is limited to only contrastive activation addition \citep{caa} which \citet{steering-clear} show is not necessarily the ideal candidate.
 Building on their work this project aims to analyse a larger range of techniques sampled from \citet{steering-clear}.
 Furthermore, the properties of training datasets is analysed in more depth to determine which properties cause steering techniques to fail.
 
-Rather than use model written evaluations \citep{mwe} a new set of steering datasets is generated with more fine grain control.
+In this thesis, rather than use model written evaluations \citep{mwe} a new set of steering datasets is generated with more fine grain control.
 The construction of these datasets is described in \Sref{sec:prompt-pairs}.
 
 \smalltitle{\citet{steering-taxonomy}}
 present a full taxonomy of current steering vector approaches (more generally \emph{representation engineering}).
-The approaches include those in \citet{steering-clear}, however, it is impractical to expand the experiments to all the approaches described due to time constraints.
-
 The paper covers a range of topics within representation engineering that have been carried out by the community.
 These focus on the types of adaptors used, the prompting framework, linear vs. non-linear adaptors, the concepts that are steered, etc.
-This project continues these comparisons by analysing the effect of the dataset and number of steering examples used in the large language model setting.
+
+This thesis continues these comparisons by analysing the effect of the dataset and number of steering examples used in the large language model setting.
+It is impractical to expand the experiments to all the approaches described in \citet{steering-taxonomy} due to time constraints so only those discussed in \citet{steering-clear} are analysed.
+
 
 \smalltitle{Sparse autoencoders as steering vectors}
 There are multiple papers that utilise sparse autoencoders (SAEs) as steering vectors \citep{sae-improved, sae-steering, icl-sae}.
-These approaches utilise the fact that SAEs decode high level concepts from the models intermediate representation.
-This can be used to manipulate the representation towards a target concept.
+SAEs work by transforming the dense model representations into a high-dimensional, sparse vector space.
+This allows individual dimensions to represent unique, human-understandable concepts effectively ``decoding'' the model representation.
+These approaches utilise this fact, that SAEs decode high level concepts from the models intermediate representation to steer the model towards or away from said concepts.
+This process works by ``reversing'' the SAE procedure and converting concepts into potential representation perturbations.
 
-Rather than utilising SAEs to steer the model this project uses the SAE features to evaluate models on free form prompts.
+This thesis, in contrast, uses the SAE features to evaluate models on free-text responses rather than utilising SAEs to steer the model.
 The SAE features provide a metric to evaluate how well the models internal representation has been effectively steered.
-SAEs are explained in \Sref{sec:sae} and their use in the project is described in \Sref{sec:prompt-pairs}.
+A detailed description of SAEs is provided in \Sref{sec:sae} and their use in this project is described in \Sref{sec:prompt-pairs}.
 
 \section{Contributions}
 \label{sec:contributions}
+
+In answering the questions posed in \Sref{sec:questions} this project provides the following contributions
+\begin{itemize}[nolistsep]
+    \item Verification of the results presented by \citet{steering-clear} in their toy experiment.
+    \item Comparison of contrastive activation addition \citep[CAA]{caa}, affine concept editing \citep[ACE]{ace}, LoReFT and LoReST on large language models.
+    \item In depth analysis on the effect of the number of steering examples on the adaptor performance.
+    \item A set of promising LLM steering metrics along with qualitative analysis of the steered model output.
+\end{itemize}
+
+All code for the project is available at \href{https://github.com/skyepurchase/msc_thesis}{this code repository} and all the \LaTeX~including diagrams is available at \href{https://github.com/skyepurchase/msc_report}{this, separate, code repository}.

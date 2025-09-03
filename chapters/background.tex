@@ -6,28 +6,23 @@
 \emph{This includes a history of the different techniques and the details of the four methods used in this project.}
 
 \emph{The history of large language models and why they are important in current research is outline.}
-\emph{Additionally the challenges that are faced in interpretting these large models is explained.}
+\emph{Additionally the challenges that are faced in interpreting these large models is explained.}
 \emph{The solutions to these challenges present possible metrics that can be used to analyse the effectiveness of steering adaptors.}
 
 \section{Notation and Concepts}
 
-Throughout this report ``neural network (NN)'' \Sref{sec:deep-learning} and ``machine learning (ML) model'' are used interchangeably though NNs are a strict subset of ML models.
-In general the term ``model'' is used to refer to the collective group and represents any program that adjusts tunable parameters to predict output from input examples.
-
 Model ``behaviours", in general, are patterns in how the model responds to input.
 This includes the desired behaviour it was trained on (such as classifying images of cats and dogs) but includes patterns in the output that were not explicitly trained for.
-Desired model behaviour is considered ``positive" and undesired model behaviour is considered ``negative".
+Desired model behaviour (such as responding truthfully) is considered ``positive" and undesired model behaviour (such as lying or subverting) is considered ``negative".
 Specifically, an example of the desired behaviour is considered a ``positive example'' and an example of undesired or neutral behaviour is considered a ``negative'' example.
-An example of a behaviour generally includes an input-output pairing similar to training examples however they are more specific pairings than would be using during training.
+An example of a behaviour generally includes an input-output pairing similar to training examples (such as a picture of a cat and a response which either tells the truth, "This is a cat", or lies, "This is a dog") however they are more specific than would be using during training.
+The specificity of steering examples is to insure the model adjust representations that elicit the target behaviour and avoid causing larger changes to behaviour.
 
 When discussing NNs the concept of a ``neuron'' relates to the abstract structure that receives a real-valued, vector input and outputs a real-value scalar based on internal, learnable weights.
 In practice, this is represented by a single element of a NN layer's output vector.
-Furthermore, a \emph{module} refers to a collection of one or more NN layers.
-A model may be made of multiple modules or be a single module.
-Modules may be ``attached'' to specific layers within a model whereby the output of the layer is passed to the module as input and the module may augment, store, or monitor the data flow in the model.
-These ideas are described and discussed in more detail in the deep learning section \Sref{sec:deep-learning}.
 
-Vectors are represented by boldface letters, $\vx, \vy, \vz$, scalars are represented by greek letters, $\alpha, \beta, \gamma$, and matrices are represented by boldface capital letters, $\mA, \mB, \mC$.
+Vectors are represented by boldface letters, $\vx, \vy, \vz$, scalars are represented by Greek letters, $\alpha, \beta, \gamma$, and matrices are represented by boldface capital letters, $\mA, \mB, \mC$.
+In general $\mR$ represents an orthonormal projection matrix into a lower dimension, $\mW$ represents a general weight matrix, and $\vb$ represents a bias vector.
 Some matrices may represent transformations or collections of feature vectors, context should disambiguate the two.
 In general vectors are column vectors, $\vx = \begin{bmatrix*}
     1 & 2 & \cdots & n
@@ -37,9 +32,6 @@ In a multi-layer machine learning model the output of an internal layer is an ``
 A positive activation is denoted $\va^+$ and a negative activation is denoted as $\va^-$. Here, ``positive activation'' means the activation extracted from the model given a positive example as above.
 The mean of a set of activations, $\mathcal{A} = \{\va_i\}_{i < n}$, is denoted $\mu_\mathcal{A} = \frac{1}{n}\sum_{i=1}^{n}\va_i$.
 Frequently the set of set of activations will be the positive activation or negative activation set, in this case the mean is denoted $\mu_{\va^+}$ or $\mu_{\va^-}$ respectively.
-
-\section{Deep Learning}
-\label{sec:deep-learning}
 
 \section{Model Alignment}
 
@@ -56,8 +48,8 @@ They outline a couple of assumptions as to whether reward modelling is suitable:
 Working on this, \citet{rlhf} apply these ideas to large language models (LLM)s.
 The goal is to transform purely predictive LLMs into assistants that are ``helpful'', ``honest'', and ``harmless''.
 This is achieved by utilising human feedback on LLM output as rewards for reward modelling.
-This technique paved the way for the model AI chatbot \citep{chatgpt}.
-The technique of reinforcement learning from human feedback (RLHF) had been developed previously by \citet{rlhf-orig} but had not been applied to LLMs.
+The idea reinforcement learning from human feedback (RLHF) had been developed previously by \citet{rlhf-orig} but had not been applied to LLMs.
+Applying the idea to modern LLMs led to the invention of the modern AI chatbot \citep{chatgpt}.
 
 RLHF has been shown to be very effective in transforming the behaviour of models.
 However, it is still possible for RLHF ``aligned'' models to be misaligned \citep{misgeneralization, c.ai}.
@@ -65,7 +57,8 @@ Furthermore, this approach to alignment is very costly requiring human annotator
 Techniques to mitigate this have been proposed including RLxF \citep{alignment-survey}, utilising both human and AI feedback, representation finetuning \citep{reft}, and parameter efficient finetuning \citep{peft}.
 
 Representation finetuning or more generally representation engineering \citep{steering-taxonomy} presents a promising avenue for alignment \citep{steering-clear, steering-theory, steering-taxonomy}.
-Rather than requiring large amounts of human annotated data and changing model weights only the representations need editting.
+Rather than requiring large amounts of human annotated data and changing model weights only the representations need editing.
+This manipulation of representations can occur after model training, with a smaller dataset, and incurs limited overheads during inference.
 This thesis focuses on \emph{steering adaptors}, a subset of representation engineering.
 
 \section{Steering Adaptors}
@@ -77,10 +70,10 @@ The goal is to keep all other aspects of the representation intact so that the p
 Rather than large amounts of annotated data or large weight matrices these techniques require a handful of positive and negative examples.
 Given their lightweight nature these techniques have shown promising results \citep{steering-taxonomy, steering-theory, steering-clear, reft}.
 
-\subsection{Contrastive Activation Addition}
+\subsection{Contrastive Activation Addition (CAA)}
 \label{caa}
 
-An intuitative approach to model intervention is to perturb the model's activations in a desired direction.
+An intuitive approach to model intervention is to perturb the model's activations in a desired direction.
 By calculating a linear direction in activation space from undesired activations towards desired ones this vector can simply be added to all activations in the model during inference.
 The hope is that the model produces output that matches the desired behaviour whilst maintaining the context of the new input.
 
@@ -88,20 +81,22 @@ The hope is that the model produces output that matches the desired behaviour wh
     \centering
     \captionsetup{width=.9\textwidth}
     \input{chapters/tikz/caa.tex}
-\caption{Demonstration of contrastive activation addition \citep{caa}. The figure represents a simple representation space of dimension 2 with clear separability. $\mu_A = \frac{1}{\|A\|}\sum_{i \in \mathcal{I}(A)} A_i$ where $A$ is a set of activation vectors. A new point, such as the black square, is translated by the steering vector.}
+    \caption{Demonstration of contrastive activation addition \citep{caa}. The figure represents a simple representation space of dimension 2 with clear separability. The average displacement between negative behaviour, $\vmu_{\va^-}$, and positive behaviour, $\vmu_{\va^+}$, represents the direction the target concept lies on. Applying this to a new point (black square) produces a new point (green square) with the desired behaviour whilst maintaining unrelated properties.}
     \label{fig:caa}
 \end{figure}
 
-In the simplest form consider two example inputs with desired and undesired behaviour.
-Their difference gives a direction in feature space that corresponds to shifting the models output from undesired behaviour towards desired behaviour.
+In the simplest form consider two example inputs, \texttt{The prime minister of the UK is Count Binface} and \texttt{The prime minister of the UK is Sir Kier Starmer},  representing undesired and desired behaviour.
+The model represents these two sentences with minor differences in its internal representation space.
+The difference of these representations gives a direction in feature space that corresponds to shifting the models output from undesired behaviour towards desired behaviour.
+Importantly, the context of the output is maintained, ``who is the prime minister of the UK?'', but the model no longer produces undesired string, ``Count Binface''.
 This is the approach proposed by \citet{activation-addition}, however, it is not robust and relies heavily on the example inputs \citep{caa}.
 
 To improve on this approach \citet{caa} suggest using a collection of examples and calculating their mean difference in activation space.
-This requires the notion of \textit{contrastive pairs}, two inputs that are similar in all ways except for the behaviour that is being changed.
-Hence, this approach is known as \textit{contrastive activation addition} (CAA).
+This requires the notion of \emph{contrastive pairs}, two inputs that are similar in all ways except for the behaviour that is being changed.
+Hence, this approach is known as \emph{contrastive activation addition} (CAA).
 This process is demonstrated in \Fref{fig:caa}.
 
-Formally, given a set of positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ a \textit{steering vector} for this behaviour is
+Formally, given a set of positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ a \emph{steering vector} for this behaviour is
 \[\vv_{steer} = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).\]
 
 Given a steering vector, $\vv_{steer}$, and a model activation during inference, $\va$, the resulting steered activation is
@@ -115,11 +110,11 @@ The model activation is replaced by the steered activation during inference resu
 This approach has a few drawbacks \citep{steerability, ace, non-linear-features} due to its assumptions.
 Primarily this approach does not consider how much of a behaviour is already present.
 This means the steering parameter does not fully determine the strength of the desired behaviour.
-Furthermore, \citet{steerability} demonstrate that this approach is not robust across behaviours that may be steered along.
+Furthermore, \citet{steerability} demonstrate that CAA is unable to consistently steer a model towards target behaviours and in some cases may steer the model \emph{towards the negative behaviour}.
 The approach assumes that concepts in activation space are linear which \citet{non-linear-features} show is not universal.
-Techniques such as affine concept editting (ACE) \Sref{sec:ace} use an affine approach to overcome these drawbacks.
+Techniques such as affine concept editing (ACE) \Sref{sec:ace} use an affine approach to overcome these drawbacks.
 
-\subsection{Affine Concept Editting}
+\subsection{Affine Concept Editing (ACE)}
 \label{sec:ace}
 
 \citet{ace} claim that CAA \citep{caa} is not sufficiently general as it does not consider how much the desired behaviour is already present.
@@ -132,11 +127,9 @@ $\va$ can be decomposed as the perpendicular and parallel components of $\vr$
             &= \text{proj}_\vr^{\perp}(\va) + \alpha\vr.
     \end{aligned}
 \end{equation}
-Adding $\lambda\vr$ as per \Eref{eq:caa} will be inconsistent as $\alpha + \lambda$ will not be equivalent across all (negative) activations.
-This shows that CAA \citep{caa} does not account for how much a behaviour may already be present in an activation.
-
-Furthemore, it is not (generally) the case that $\mathbf{0}$ represents lack of behaviour.
-Instead there is some vector $\va_0$ that represents the lack of the target behaviour.
+This shows that CAA \citep{caa} does not account for how much a behaviour may already be present in an activation, represented by $\alpha\vr$.
+However $\alpha = 0$ is not necessarily the absence of the target behaviour, that is, it is not (generally) the case that $\mathbf{0}$ represents lack of behaviour.
+Instead assume some vector $\va_0$ represents the lack of the target behaviour.
 \Eref{eq:components} can incorporate this idea as follows
 \begin{align*}
     \va &= \va_0 + \Delta\va \\
@@ -156,7 +149,7 @@ Removing the behaviour by setting $\alpha^\prime = 0$ yields
     \centering
     \captionsetup{width=.9\textwidth}
     \input{chapters/tikz/ace.tex}
-    \caption{A comparison of CAA \citep{caa} and affine concept editting \citep{ace}. This is a reproduction of Figure 1 in \citet{ace} with the steering towards the positive examples instead. Compared to CAA, ACE does not adjust perpendicular components but correctly adjusts those parallel to the steering direction.}
+    \caption{A comparison of CAA \citep{caa} and affine concept editing \citep{ace}. This is a reproduction of Figure 1 in \citet{ace} with the steering towards the positive examples instead. Compared to CAA, ACE does not adjust perpendicular components but correctly adjusts those parallel to the steering direction.}
     \label{fig:ace}
 \end{figure}
 
@@ -167,17 +160,19 @@ The behaviour can be reintroduced at any relevant strength resulting in
     \label{eq:ace}
     \va_\text{steered} = \va_0 - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
 \end{equation}
+
 This process is described graphically in \Fref{fig:ace}.
 
 Given positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ the reference point and steering direction are
 \begin{align*}
-    \va_0 = \frac{1}{n}\sum_{i=1}^{n}\va_i^- && \vr = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).
+    \vr = \frac{1}{n}\sum_{i=1}^{n}(\va_i^+ - \va_i^-) && \alpha_0 = \text{proj}_\vr^\parallel\left(\frac{1}{n}\sum_{i=1}^{n}\va_i^-\right)
 \end{align*}
+A proof that these definitions are the optimal assignments is presented in \Aref{app:ace}.
 
 This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
-This is therefore affine and hence the name \textit{affine concept editting} (ACE) \citep{ace}.
+This is therefore affine and hence the name \emph{affine concept editing}.
 
-\subsection{Low-rank Representation Finetuning}
+\subsection{Low-rank Representation Finetuning (LoReFT)}
 \label{loreft}
 
 Both CAA \citep{caa} and ACE \citep{ace} edit the activations in their full rank form and rely on addition (whether affine or linear).
@@ -187,10 +182,16 @@ However, perform affine transformations to the full rank activation is costly as
 
 \citet{reft} present a low-rank steering adaptor inspired by parameter-efficient finetuning methods such as LoRA \citep{lora}, DoRA \citep{dora} and adaptor-based methods \citep{petl}.
 Unlike steering these approaches aim to finetune a model using reduced parameter counts compared to the original model.
-Rather than finetuning a model this approach aims to edit the representations of the model, this is equivalent to steering.
+This approach uses a small set of parameters that augment a model layers output, these can be trained whilst the original model weights remain the same greatly reducing the number of parameters needed to be trained.
 
-The key insight is to steer the activations in a low-rank space.
-The specific approach is based on the distributed interchange intervention\footnote{This tests whether a concept is encoded in some subspace. When working with low-rank editting this is exactly the assumption we use.} \citep{dii} with the following form
+Rather than finetuning a model, LoReFT edits the representations of the model, equivalent to steering.
+To reduce the parameter count this learnable steering is performed in a low-rank space.
+The specific approach is based on the distributed interchange intervention \citep[DII]{dii}.
+DII is a version of interchange intervention whereby a causal model (with human understanable structure) is aligned with a neural network (NN) that exhibits the same behaviour.
+By identifying possible neurons that exhibit the same behaviour as intermediate nodes in the causal model it is possible to intervene with the neuron's value across different inputs and verify the output behaviour matches how the causal model behaves.
+This is very similar to the goal of steering adaptors except there is no associated causal model, simply an alignment goal.
+Rather than brute-force search for the corresponding neuron for a causal node, \citet{dii} suggest projecting the respresentations into a lower dimensional space, comparing the causal node value and the NNs neuron, then projecting back.
+\citet{reft} present the following form of DII for the case of representation finetuning.
 \begin{equation*}
     DII(\vx,\vy,\mR) = \vx + \mR^T(\mR\vy - \mR\vx)
 \end{equation*}
@@ -207,7 +208,7 @@ where $\mR \in \mathbb{R}^{r\times d}$ is a low-rank projection matrix.
 \citet{reft} suggest replacing $\mR\vy$ with an affine transformation $\mW\vx + \vb$.
 Thus, the adaptor learns a transformation, $\mR\va^+ = \mW\va^- + \vb$, from negative activations to positive low-rank representations.
 In this way the adaptor can learn low-rank representations of activations that encapsulate the desired behaviour and adjust the activations in a parameter efficient space.
-The approach is therefore a \textit{low-rank representation finetuning} (LoReFT) adaptor.
+The approach is therefore a \emph{low-rank representation finetuning} (LoReFT) adaptor.
 The full adaptor is
 \begin{equation}
     \label{eq:loreft}
@@ -219,25 +220,39 @@ $\mR$ is constrained to be an orthogonal projection matrix achieved by different
 Given a dataset of contrastive pairs $\mathcal{D} = (\va_i^-, \va_i^+)_{i\le n}$ the adaptor parameters $\phi$ are trained.
 The goal is to accurately predict $\va_i^+$ given $\va_i^-$ as input.
 
-Unlike CAA \citep{caa} and ACE \citep{ace} this approach requires paired datapoints as the adaptor needs to learn a transformation from negative examples to positive examples.
+Unlike CAA and ACE, LoReFT requires paired datapoints as the adaptor needs to learn a transformation from negative examples to positive examples.
 This drawback means that in the low data regime this approach is less effective than the other two approaches.
 However, with sufficient data, this method is able to outperform CAA and ACE as it can utilise more complex transformations between negative and positive behaviour.
 The poor performance in low data regimes is improved on by \citet{steering-clear} with their low-rank representation steering adaptor.
 
-\subsection{Low-rank Representation Steering}
+\subsubsection{QR decomposition}
+
+Any real-valued square matrix, $\mA$, can be decomposed as
+\begin{equation*}
+    \mA = \mQ\widehat\mR
+\end{equation*}
+where $\mQ$ is an orthogonal matrix (that is $\mQ^T = \mQ^{-1}$) and $\widehat\mR$ is upper triangular (not to be confused with $\mR$ the projection matrix above).
+$\mQ$ can be viewed as a new basis where the first column of $\mA$ is normalised, then the perpendicular component of the next column of $\mA$ is normalised.
+This process repeats forming a new orthonormal basis based on $\mA$.
+
+The process described above is known as the \emph{Gram-Schmidt process}.
+By running this process on a hidden matrix $\mA \in \mathbb{R}^{d\times r}$ an orthonormal matrix $\mQ \in \mathbb{R}^{d\times r}$ can be generated.
+$\mQ$ can then be used as the projection matrix discussed above.
+
+\subsection{Low-rank Representation Steering (LoReST)}
 \label{lorest}
 
-\citet{steering-clear} suggest modifying LoReFT \citep{reft} to dynamically drop low-rank dimensions and bring the learnable bias term outside of the low-rank space.
-This allows the model to perform well in the low data regime by relying on linear methods similar to CAA \citep{caa} but keep the benefits of LoReFT.
+\citet{steering-clear} suggest modifying LoReFT to dynamically drop low-rank dimensions and bring the learnable bias term outside of the low-rank space.
+This allows the model to perform well in the low data regime by relying on linear methods similar to CAA but keep the benefits of LoReFT.
 By dynamically dropping dimensions the adaptor has more freedom to optimise the rank of the projection.
 
 \citet{steering-clear} define an orthogonal projection
 \begin{align*}
-    \mP = \mI - \mQ\text{diag}(\vp)\mQ^T && \vp_i = \text{GumbelSoftmax}([\vl_i,0];\tau)
+    \mP = \mI - \mR\text{diag}(\vp)\mR^T && \vp_i = \text{GumbelSoftmax}([\vl_i,0];\tau)
 \end{align*}
-where $\mQ \in \mathbb{R}^{r\times d}$ is a learnable low-rank projection matrix, $\vl$ is a learnable Gumbel Softmax distribution probabilities, and $\tau$ is the temperature.
-As with LoReFT, $\mQ$ is an orthogonal projection achieved by differentiable QR decomposition.
-In comparison to LoReFT \Eref{eq:loreft} there is no representation editting in the low-rank space.
+where $\mR \in \mathbb{R}^{r\times d}$ is a learnable low-rank projection matrix, $\vl$ is a learnable Gumbel Softmax distribution probabilities, and $\tau$ is the temperature.
+As with LoReFT, $\mR$ is an orthogonal projection achieved by differentiable QR decomposition.
+In comparison to LoReFT \Eref{eq:loreft} there is no representation editing in the low-rank space.
 Instead the projection acts as a method to ``zero'' the activation similar to ACE \citep{ace}.
 
 The full adaptor is
@@ -254,17 +269,40 @@ In the low data regime the adaptor can learn to drop more dimensions and rely on
 As more data is available the adaptor can rely more on the low-rank projection similar to LoReFT \citep{reft}.
 In this way the adaptor is able to perform consistently across different data regimes.
 
+\subsubsection{Gumbel-Softmax}
+
+The aim of Gumbel-Softmax is to sample from a categorical distribution whilst maintaining backpropagation.
+This is useful in LoReST as it allows the adaptive selection of low-rank dimensions by modelling the choice to keep or drop a dimension as a 2 value categorical distribution.
+
+Consider sampling from a categorical distribution with $K$ categories.
+Let $X$ represent the random variable, then
+\begin{equation*}
+    X = \max\left\{i : \pi_1 + \pi_2 + \dots + \pi_{i-1} \le U\right\}
+\end{equation*}
+where $\pi_j$ is the probability of category $j$ and $U \sim Uniform(0,1)$.
+
+Due to the $\max$ operation this is not differentiable.
+Using the reparameterisation trick, and taking samples $G_i \sim Gumbel(0,1)$, $X$ can be represented as
+\begin{equation*}
+    \arg\max_i\left\{G_i + \log(\pi_i)\right\}.
+\end{equation*}
+
+This is still not differentiable however, when taking onehot vector representations, $\arg\max$ can be approximated by softmax.
+In practice an additional temperature variable $\tau$ is introduced giving
+\begin{equation*}
+    x_i = \frac{\exp\left(\frac{G_i + \log(\pi_i)}{\tau}\right)}{\sum_{j}\exp\left(\frac{G_j + \log(\pi_j)}{\tau}\right)}.
+\end{equation*}
+
+As $\tau \to 0$ the computation approaches $\arg\max$ and as $\tau \to \infty$ the computation approaches uniform.
+
 \section{Large Language Models}
 
 Steering and model alignment in general is not confined to large language models (LLM)s however these are currently the most widespread model in use.
-LLMs aim to immitate, complete, or analyse natural language and are characterised by incredibly large numbers of parameters.
-Some are as large as 1.76 trillion \citep{gpt4-count} and even small models have as many as 1 billion \citep{gemma}.
+LLMs are trained to generate text mimicking the natural language training distribution and are characterised by incredibly large parameter counts.
+Some models are as large as 671 billion \citep{deepseek} and even small models have as many as 1 billion \citep{gemma}.
 
-Only generative LLMs are discussed in this project.
-These are models which are not trained to classify or fit a dataset in the classical sense but instead to produce more data as if it were sampled from the underlying training distribution.
-In the case of LLMs this means producing coherent natural language.
-
-The underlying technology behind modern generative LLMs is the transformer \citep{transformers} and their many derivatives \citep{linear-attention, bigbird, linformer}.
+LLMs are not trained to classify or fit a dataset in the classical sense but instead to produce more data as if it were sampled from the underlying training distribution.
+In practice this means producing coherent natural language which they incredibly well \citep{c.ai}. The key improvement in modern LLM performance is due to the Transformer \citep{transformers} and their many derivatives \citep{linear-attention, bigbird, linformer}.
 
 \subsection{Transformers}
 
@@ -276,7 +314,7 @@ Attention can be considered as a learnable lookup table with queries, keys and v
 If a query and a key are similar then the corresponding value should be returned.
 This can be represented as a dot-product between a matrix of queries $\mQ$ and keys $\mK$.
 These are normalised to act as probabilities that a specific value is the target value.
-Given a matrix of values $\mV$ attentio is represented by the following equation
+Given a matrix of values $\mV$ attention is represented by the following equation
 \begin{equation*}
     \text{softmax}\left(\frac{\mQ\mK^T}{\sqrt{d_k}}\right)\mV.
 \end{equation*}
@@ -292,18 +330,18 @@ This allows a model to ``attend" to different parts of the input by adjusting th
     \label{fig:transformer}
 \end{figure}
 
-Modern transformers contain attention blocks each containing multiple ``attention heads'' that use the above mechanism.
+Modern Transformers contain attention blocks each containing multiple ``attention heads'' that use the above mechanism.
 This allows the model to respond dynamically to a large range of inputs.
 After this attention block a standard multi-layer perceptron (MLP) is added.
 This constitutes the transformer block and is visualised in \Fref{fig:transformer}.
 
-The ability for transformers to utilise context in surrounding input values makes them particularly suited to natural language processing (NLP).
+The ability for Transformers to utilise context in surrounding input values makes them particularly suited to natural language processing (NLP).
 The meaning of words in a sentence depend on the words that surround it.
 Furthermore, the words depend on each other in different ways depending on the context.
 This is precisely how transformer attention blocks work allowing them to parse natural language far better than previous attempts.
 
-For transformers to work on natural language the input needs to be tokenized into descrete chunks, frequently based on words.
-These chunks can then be converted to unique numbers and later represented as input features.
+For Transformers to work on natural language the input needs to be tokenized into discrete tokens.
+These tokens can then be converted to unique numbers and later represented as input features.
 To aid the model, the position of the token within the sentence is also encoded this is known as ``positional encoding''.
 This allows the model to distinguish between the two instances of ``can'' in the sentence ``can you pass me the can''.
 
@@ -331,7 +369,7 @@ This poses a problem for interpretability as it is not sufficient to assign mean
 This phenomenon has been shown to occur in LLMs and has been demonstrated in toy examples \citep{superposition}.
 
 \citet{superposition} propose the idea of ``superposition'' to explain why large models contain polysemantic neurons.
-Superposition is the process of NNs representing more features than neurons within the model.
+Superposition is the process of NNs representing more features than neurons within a specific hidden layer.
 The features are no longer represented orthogonally in the representation space but instead share components.
 This means that if only one (sparse) feature is active the non-orthogonal features will also be partially active.
 
@@ -351,10 +389,11 @@ This is a known problem known as ``sparse dictionary encoding'' \citep{sparse-co
 The SAE module is demonstrated in \Fref{fig:sae}.
 
 An SAE is an adaptor that takes a model layer's input and produces a replica of the layer's output.
-In comparison to the model layer the SAE has a large hidden representation dimension in which sparsity is enforced.
+In comparison to the model layer the SAE has a large hidden representation dimension in which sparsity is enforced (e.g. $24576$ for GPT-2 SAEs compared to $756$ \citep{saelens}).
 This can be achieved in multiple ways such as clamping to the $k$ highest activations \citep{k-sparsity} or adding a sparsity regularising loss.
 After training the elements of the SAE hidden dimension are given interpretations to better understand the model.
-It is worth noting that SAEs have been shown to demonstrate subpar performance when used for interpretability \citep{saes-bad}, though this project uses SAEs for dataset analysis.
+It is worth noting that SAEs have been shown to demonstrate subpar performance when used for interpretability \citep{saes-bad}.
+In contrast, this thesis utilises SAEs to track model representation changes and spurious correlations, a use case \citet{saes-bad} suggest is still valid.
 
 SAEs are challenging to train and so for the purposes of this project only pretrained SAEs are used.
 \citet{saelens} provides a large collection of open source SAEs with their corresponding models.

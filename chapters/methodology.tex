@@ -5,16 +5,19 @@
 \emph{This includes how the models are trained or selected, how the steering datasets are generated, and what the steering task is.}
 \emph{The specific metrics used to evaluate the steering adaptors are presented with a justification for their use.}
 
-\emph{In the case of the steering clear \citep{steering-clear} reproduction any deviations from the original experiments are explained and justified.}
-\emph{A detailed analysis of the attempts to reproduce steering clear are presented in \Aref{app:steering-clear} along with additional analysis not important to the main project.}
+\emph{In the case of the {\scshape Steering Clear} \citep{steering-clear} reproduction any deviations from the original experiments are explained and justified.}
+\emph{A detailed analysis of the attempts to reproduce {\scshape Steering Clear} are presented in \Aref{app:steering-clear} along with additional analysis not important to the main project.}
 
-\section{Steering Clear Environment}
+In both the {\scshape Steering Clear} and the Prompt Pairs environments 4 steering adaptors are considered, CAA \citep{caa}, ACE \citep{ace}, LoReFT \citep{reft}, and LoReST \citep{steering-clear}.
+These adaptors are described in detail in the previous chapter.
+
+\section{{\scshape Steering Clear} Environment}
 \label{sec:steering-clear}
 
 The setup of this environment follows \citep{steering-clear}.
 The model to steer is a 4-layer multi-layer perceptron (MLP) with residual connections \citep{resnet} across all layers.
 After the MLP, a layernorm \citep{layernorm} and single layer classifier is added.
-All non-linearity throughout the model is gaussian error linear unit (GeLU).
+All non-linearity throughout the model is Gaussian error linear unit (GeLU).
 The hidden layers follow 512-512-256-512 architecture regardless of dataset specifics.
 
 \subsection{Dataset}
@@ -22,15 +25,15 @@ The hidden layers follow 512-512-256-512 architecture regardless of dataset spec
 
 To control the behaviour of model and the steering approaches a synthetic dataset is used.
 Each dataset sample consists of $m$ ``attributes" which can take 8 possible discrete values.
-Each discrete value is represented by an ``anchor'' vector $\vmu_i \in \mathbb{R}^8, i \in \{1,8\}$ sampled from a gaussian distribution $\mathcal{N}(\vzero, 1)$.
-To simulate real-world conditions gaussian noise is added to the samples from $\mathcal{N}(\vzero, 0.1)$.
-This does mean the values are generally highly seperable.
+Each discrete value is represented by an ``anchor'' vector $\vmu_i \in \mathbb{R}^8, i \in \{1,8\}$ sampled from a Gaussian distribution $\mathcal{N}(\vzero, 1)$.
+To simulate real-world conditions Gaussian noise is added to the samples from $\mathcal{N}(\vzero, 0.1)$.
 
 The dataset comprises of $n$ input-output vectors where the input vector is the concatenation of $m$ 8-dimensional vectors.
 Thus, an input vector has length $8m$ and the target vector has length $m$.
 \citet{steering-clear} carry out a range of experiments for $m \in \{60, 90, 120\}$ but always use 8 values represented by 8 dimensional vectors.
 They take a sample of $2,000,000$ i.i.d samples but due to memory constraints only $500,000$ are used in this project.
-No test set is used in either however an 80:20 split for training and validation set is used for identifying the best performing model.
+No test set is used in either however an 80:20 split train:validation split is used.
+Early stopping on the validation set is used to select the model to steer, no hyperparameter tuning for the model is carried out.
 
 \subsection{Pre-training}
 
@@ -51,8 +54,9 @@ Instead, this reproduction will focus on steering only one attribute at a time.
 As the attribute anchors are generated randomly there is no dataset bias towards any particular value.
 For this reason all attributes are steered towards value $\vmu_1$.
 
-In addition to the dataset generate, $4096$ are generated as a training set for the steering approaches and a further $1000$ are generated as a test set.
-This is repeated 20 times to get an average metric across steering approaches.
+In addition to the model training dataset and additional $4096$ positive and negative steering example pairs are generated as a training set for the steering adaptors with a further $1000$ pairs generated as a test set.
+Each of the $5096$ pairs target a single attribute with positive examples setting the attribute value to $\vmu_1$ and the negative examples taking any attribute value \emph{except for $\vmu_1$}.
+This is repeated 20 times, targeting different attributes, to get an average metric across steering approaches.
 
 For each adaptor a range of hyperparameters is used to analyse the effect on steering performance.
 The number of steering examples is also varied from $4$ up to $4096$ increasing in powers of $2$.
@@ -68,23 +72,22 @@ Instead the accuracy on only the steered attribute is used.
 Specifically, CAA uses the hyparparameters $\lambda \in \{1, 2, 3, 5\}$ with both LoReFT and LoReST using ranks in the set $\{1, 2, 3, 5, 10, 20\}$.
 For the low-rank methods 2000 epochs of training using minimum square error and the Adam \cite{adam} optimiser with a learning rate of $0.001$ was used.
 
-ACE was not presented in \citet{steering-clear} however the adaptor behaves similarly to CAA as it is also an affine method.
+\smalltitle{ACE} was not presented in \citet{steering-clear} however the adaptor behaves similarly to CAA as it is also an affine method.
 Therefore, the same set of values was used with the addition of $10$.
 Specifically the hyperparameters $\alpha \in \{1, 2, 3, 5, 10\}$ are used.
 
 \section{Prompt Pairs Environment}
 \label{sec:prompt-pairs}
 
-\citet{steering-clear} aim to analyse the effects of model feature density and the number of steering examples.
-To achieve this the set up a toy environment with synthetic data and a small, controllable model.
-To analyse similar effects, as well as the effects of the steering dataset, in a situation closer to real-world use requires utilising real-world models.
+To analyse the effects of example set size in the natural language setting this novel environment is proposed.
+This dataset analyses the same effects on adaptor performance in relation to example set that \citet{steering-clear} make in {\scshape Steering Clear}.
+This provides further insight into how these adaptors perform in the real-world setting.
 
 As only LLMs are considered this means the dataset is made of natural language prompts.
 Positive and negative activations are sampled from the target layer and the last token.
 Generally, the two prompts used to extract positive and negative activations are identical except for the last token \citep{steerability, icv, activation-addition}.
 
-\subsection{dataset}
-\label{sec:pp-dataset}
+\subsection{Dataset}
 
 Rather than generate thousands of entirely unique pairs of prompts a smaller set of templates with adjustable ``contexts'' and ``targets'' is used.
 And example template would be:
@@ -95,12 +98,13 @@ Then a range of relevant contexts (such as \texttt{the dancer} or \texttt{the dr
 A standard prompt pair is therefore two prompts who's templates and contexts are identical but who's targets are in opposition.
 As the target is the last word activations can be extracted to steer the model from the negative target to the positive target.
 
-Unlike the model written evaluations \citep{mwe} dataset used in \citet{steerability} this dataset does not use multiple choice questions and instead a small range of target values.
-This allows the model to produce more tokens than just ``yes'', ``no'' or ``A'', ``B''.
-This also allows for more control, such as changing context between positive and negative pairs or using ``random'' negative targets and meaningful positive targets.
-Note that all targets are \emph{a single word} or ideally token to simplify the steering process.
+This dataset uses free-text responses with example phrases including only a single generated token.
+This is opposed to model written evaluations \citep{mwe} dataset used in \citet{steerability} which uses multiple choice questions (MCQs).
+MCQs work by providing the model two (or occasionally four) possible responses.
+This, in theory, forces the model to embed all the context of the response into the single ``yes'', ``no'', ``A'', or ``B'' token.
+In contrast, the proposed dataset also allows for more control, such as changing context between positive and negative pairs or using ``random'' negative targets and meaningful positive targets.
 
-Rather than a single dataset of this form multiple datasets are generated that cover a range of contexts and behaviours.
+Rather than a single dataset of this form multiple datasets are generated that cover a range of contexts and behaviours (e.g. ``preference for agreement over disagreement", ``preference for criminals over law enforcement", ``preference for success over failure").
 They are aimed to be useful real-world situations however they are still fabricated and so are not a perfect representation.
 To generate the large number of templates, contexts and targets a set of example sentences were generated by GPT-5 \citep{gpt-5} and adjusted to extract templates, contexts and targets.
 
@@ -109,44 +113,55 @@ The full list of templates, contexts and targets are presented in \Sref{app:prom
 \subsection{Steering Task}
 
 The goal is to steer the model from generating the negative targets to generating the positive targets.
-As the negative and positive targets have many potential options it is possible the model does not produce the exact same positive target word, however, getting the correct semantic meaning is the aim.
+This means generating free-text responses that match the semantics of the positive target, but also effectively altering the models internal representation.
+This means increasing SAE features that are activated in the positive target and maintaining near zero activation for unrelated SAE features.
 
-For each of the datasets, after activation extraction, 100 are separated for testing and the rest used for adaptor traing/initialisation.
+For each of the datasets 100 positive and negative example phrases are separated for testing, the rest used for adaptor training/initialisation.
 Similar to \citet{steering-clear}, a range of example pairs are used ranging from 4 example pairs to 1024 example pairs.
-The same range of adaptor hyperparameters are used to roughly compare the toy experiment to real-world scenarios.
-The experiments are also run without any adaptor to get a baseline value to compare from.
-All steering metrics are averaged over the range of datasets to get an average efficacy across the datasets.
+The same range of adaptor hyperparameters are used to compare the toy experiment to real-world scenarios.
+The experiments are also run without any adaptor (i.e. the unsteered model) to get a baseline value to compare from.
+The mean steering metric over the range of datasets is presented to prevent biased results based on dataset content.
 
-\smalltitle{Steering metrics.} Unlike the steering clear environment \Sref{sec:steering-clear}, it is hard to quantify accuracy on the steered attribute.
-Instead 3 metrics are used to evaluate the success of the steering approach.
+\smalltitle{Steering metrics.} Unlike the {\scshape Steering Clear} environment \Sref{sec:steering-clear}, it is hard to quantify accuracy on the steered attribute as free-text does not have a clear accuracy metric.
+Instead, this thesis proposes 3 metrics to evaluate the success of the steering approach.
+\begin{itemize}[nolistsep]
+    \item Mean target SAE feature activation.
+    \item Mean spurious SEA feature activation. That is, SAE features that are not activated by either positive or negative examples.
+    \item Semantic similarity between the generated output and the target phrase.
+\end{itemize}
+Along with the analysis of the adaptor performance the suitability of the metrics is also discussed.
+The SAE metrics provide insight into how the models internal representation has changed whilst verifying only the target concepts have been altered.
+The semantic similarity metric verifies that the observed behaviour has also changed and not just how the model represents concepts.
 
-Two are based on the SAE, \Sref{sec:sae}, features of the final, target token of the model at the target layer:
-\begin{enumerate}[nolistsep]
-    \item During activation extraction, the SAE features that are consistently activated on the final token across all \emph{positive} examples are identified.
-        The average activation of these features during training is used to evaluate how well the steering adaptor is increasing the models representation of the target behaviour.
-    \item A random selection of SAE features that were consistently not activated for \emph{both} examples during activation extraction are considered test features.
-        The average activation of the test features during training is used to evaluate how well the adaptor effects only the target features.
-\end{enumerate}
-Together these provide insight into how well the adaptor steers the internal model representations towards the intended behaviour.
+The SAE features for each dataset are chosen during the preprocessing step, when model activations are extracted for adaptor training.
+Model extraction is achieved by saving the model's internal representation at a specific layer to an external file.
+During this step the SAE features which are consistently active across all positive examples (including test examples) are chosen as the target features.
+The exact interpretation of these features is not important, simply that the SAE features represent the models representation of positive behaviour.
+Similarly, the SAE features which do not activate across \emph{both} positive and negative features are noted.
+A random selection of these features are chosen as the spurious feature set.
+Together these provide insight into how well the adaptor steers the internal model representations towards the intended behaviour without effecting unrelated concepts and behaviours.
 
-To gather information about how well the adaptors effect the output the semantic similarity of the generated completion from the model and the target completion.
-Using distilbert \citep{distilbert} as a semantic embedding of words the average cosine similarity between generated completion and target completion across the test examples is used.
+To calculate semantic similarity the model output is embedded into a vector space where distance represents semantic similarity.
+This is achieved using Distilbert \citep{distilbert} which embeds text into vectors that preserve the semantics of the input text.
+The cosine similarity between these embedded vectors represents how close in representation space the two phrases are and therefore how semantically similar the two phrases are.
 This provides a metric for the semantic similarity of the models generated text and the target text.
-The similarity of the prompt and the completion is used in its entirity to provide better context for the semantic similarity.
+The similarity of the prompt and the completion is used in its entirety to provide better context for the semantic similarity.
 
 Each metric on its own is useful but can be prone to biases that the other metrics highlight.
-A more complete picture of how the adaptors and models behaved can be achieved by analysing all three metrics together.
+A more complete picture of how the adaptors performed is achieved by analysing all three metrics together.
 
 Finally, though this project aims to quantitatively analyse the performance of different adaptors on natural language it is important to see the generated completions.
 In all three metrics it is possible for the adaptor to arbitrarily increase the quantitative value resulting in nonsense sentences.
-After the quantitative analysis a selection of generated sentences across the adaptors, hyperparameters, and datasets will be presented and analysed.
+This motivates the use of qualitative analysis alongside the quantitative analysis.
+A selection of generated sentences across the adaptors, hyperparameters, and datasets is presented and analysed qualitatively.
+Together with the quantitative analysis this provides verification of the adaptors performance whilst also providing an opportunity to evaluate the proposed metrics effectiveness.
 
 \subsection{Hyperparameters}
 
-As the affine methods are agnostic to the dimension of the activations their hyperparameters should remain the same as steering clear \Sref{sec:steering-clear}.
+Affine methods are agnostic to the dimension of the activations and so their hyperparameters should remain the same as {\scshape Steering Clear} \Sref{sec:steering-clear}.
 The hyperparameters are therefore $\lambda \in \{1, 2, 3, 5\}$ for CAA and $\lambda \in \{1, 2, 3, 5, 10\}$ for ACE.
 
 The low-rank methods do, indirectly, rely on the dimension of the activations as they project the activations into a lower dimensional space.
-In the case of GPT-2 \cite{gpt-2} the activation dimension is 756 which is exactly triple 256 therefore the new set of ranks should be triple those in \citet{steering-clear}.
-Specifically the values $\{3, 5, 10, 20, 30, 60\}$ are used.
-This assumes that the rank of the low-rank adaptor is linked only to the dimension of the activations and not properties such as superposition \Sref{sec:sae}.
+Assuming that the optimal rank of the low-rank adaptor is linked to the dimension of the activations, and is not affected by superposition \Sref{sec:sae}, an increase in activation dimension is expected to result in an increase in optimal rank.
+In {\scshape Steering Clear} the activation dimension is 256 with corresponding hyperparameter values $\{1, 2, 3, 5, 10, 20\}$.
+In the case of GPT-2 \cite{gpt-2} the activation dimension is 756, triple 256, therefore the hyperparameter values $\{3, 5, 10, 20, 30, 60\}$ are used.
