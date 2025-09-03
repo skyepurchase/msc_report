@@ -2,11 +2,11 @@
 \label{app:ace}
 
 \begin{remark}
-    Recall the affine approach to steering from \Eref{eq:ace}
+    Recall the affine approach to steering from \cref{eq:ace}
     \begin{equation*}
         \va_\text{\normalfont steered} = \va - \text{\normalfont proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
     \end{equation*}
-    Given a set of positive example activations $\{\va_i^+\}_i$ and negative example activations $\{\va_i^-\}_i$ the appropriate choices for $\va_0$ and $\vr$ are
+    Given a set of positive example activations $\{\va_i^+\}_i$ and negative example activations $\{\va_i^-\}_i$ the appropriate choices for $\alpha_0$ and $\vr$ are
     \begin{equation}
         \label{eq:ace-app}
         \begin{aligned}
@@ -56,5 +56,5 @@
         \vr = \mu_{\va^+} - \mu_{\va^-} = \frac{1}{n}\sum_{i=1}^{n}\va_i^+ - \frac{1}{n}\sum_{i=1}^{n}\va_i^- = \frac{1}{n}\sum_{i=1}^{n}(\va_i^+ - \va_i^-)
     \end{equation*}
     is found.
-    This leads to the result for $\alpha_0$ and $\vr$ in \Eref{eq:ace-app}.
+    This leads to the result for $\alpha_0$ and $\vr$ in \cref{eq:ace-app}.
 \end{proof}

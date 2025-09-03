@@ -85,16 +85,16 @@ The hope is that the model produces output that matches the desired behaviour wh
     \label{fig:caa}
 \end{figure}
 
-In the simplest form consider two example inputs, \texttt{The prime minister of the UK is Count Binface} and \texttt{The prime minister of the UK is Sir Kier Starmer},  representing undesired and desired behaviour.
+In the simplest form consider two example inputs, \texttt{The prime minister of the UK is Count Binface} and \texttt{The prime minister of the UK is Sir Kier Starmer},  representing undesired (untruthful) and desired (truthful) behaviour.
 The model represents these two sentences with minor differences in its internal representation space.
-The difference of these representations gives a direction in feature space that corresponds to shifting the models output from undesired behaviour towards desired behaviour.
-Importantly, the context of the output is maintained, ``who is the prime minister of the UK?'', but the model no longer produces undesired string, ``Count Binface''.
+The difference of these representations gives a direction in feature space that corresponds to shifting the models output from undesired behaviour towards desired behaviour (a ``truthfulness'' direction).
+Importantly, the context of the output is maintained, ``who is the prime minister of the UK?'', but the model no longer produces the undesired (false) string, ``Count Binface''.
 This is the approach proposed by \citet{activation-addition}, however, it is not robust and relies heavily on the example inputs \citep{caa}.
 
 To improve on this approach \citet{caa} suggest using a collection of examples and calculating their mean difference in activation space.
 This requires the notion of \emph{contrastive pairs}, two inputs that are similar in all ways except for the behaviour that is being changed.
 Hence, this approach is known as \emph{contrastive activation addition} (CAA).
-This process is demonstrated in \Fref{fig:caa}.
+This process is demonstrated in \cref{fig:caa}.
 
 Formally, given a set of positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ a \emph{steering vector} for this behaviour is
 \[\vv_{steer} = \frac{1}{n}\sum_{i=1}^{n}\left(\va_i^+ - \va_i^-\right).\]
@@ -112,7 +112,7 @@ Primarily this approach does not consider how much of a behaviour is already pre
 This means the steering parameter does not fully determine the strength of the desired behaviour.
 Furthermore, \citet{steerability} demonstrate that CAA is unable to consistently steer a model towards target behaviours and in some cases may steer the model \emph{towards the negative behaviour}.
 The approach assumes that concepts in activation space are linear which \citet{non-linear-features} show is not universal.
-Techniques such as affine concept editing (ACE) \Sref{sec:ace} use an affine approach to overcome these drawbacks.
+Techniques such as affine concept editing (ACE) \cref{sec:ace} use an affine approach to overcome these drawbacks.
 
 \subsection{Affine Concept Editing (ACE)}
 \label{sec:ace}
@@ -130,7 +130,7 @@ $\va$ can be decomposed as the perpendicular and parallel components of $\vr$
 This shows that CAA \citep{caa} does not account for how much a behaviour may already be present in an activation, represented by $\alpha\vr$.
 However $\alpha = 0$ is not necessarily the absence of the target behaviour, that is, it is not (generally) the case that $\mathbf{0}$ represents lack of behaviour.
 Instead assume some vector $\va_0$ represents the lack of the target behaviour.
-\Eref{eq:components} can incorporate this idea as follows
+\cref{eq:components} can incorporate this idea as follows
 \begin{align*}
     \va &= \va_0 + \Delta\va \\
         &= \va_0 + \text{proj}_\vr^{\perp}(\Delta\va) + \text{proj}_\vr^{\parallel}(\Delta\va) \\
@@ -161,13 +161,13 @@ The behaviour can be reintroduced at any relevant strength resulting in
     \va_\text{steered} = \va_0 - \text{proj}_\vr^{\parallel}(\va) + \alpha_0\vr + \alpha\vr.
 \end{equation}
 
-This process is described graphically in \Fref{fig:ace}.
+This process is described graphically in \cref{fig:ace}.
 
 Given positive example activations $(\va_i^+)_{i\le n}$ and negative example activations $(\va_i^-)_{i\le n}$ the reference point and steering direction are
 \begin{align*}
     \vr = \frac{1}{n}\sum_{i=1}^{n}(\va_i^+ - \va_i^-) && \alpha_0 = \text{proj}_\vr^\parallel\left(\frac{1}{n}\sum_{i=1}^{n}\va_i^-\right)
 \end{align*}
-A proof that these definitions are the optimal assignments is presented in \Aref{app:ace}.
+A proof that these definitions are the optimal assignments is presented in \cref{app:ace}.
 
 This approach is no longer a linear edit to the activations and now includes a bias term, $\va_0$.
 This is therefore affine and hence the name \emph{affine concept editing}.
@@ -252,7 +252,7 @@ By dynamically dropping dimensions the adaptor has more freedom to optimise the 
 \end{align*}
 where $\mR \in \mathbb{R}^{r\times d}$ is a learnable low-rank projection matrix, $\vl$ is a learnable Gumbel Softmax distribution probabilities, and $\tau$ is the temperature.
 As with LoReFT, $\mR$ is an orthogonal projection achieved by differentiable QR decomposition.
-In comparison to LoReFT \Eref{eq:loreft} there is no representation editing in the low-rank space.
+In comparison to LoReFT \cref{eq:loreft} there is no representation editing in the low-rank space.
 Instead the projection acts as a method to ``zero'' the activation similar to ACE \citep{ace}.
 
 The full adaptor is
@@ -333,7 +333,7 @@ This allows a model to ``attend" to different parts of the input by adjusting th
 Modern Transformers contain attention blocks each containing multiple ``attention heads'' that use the above mechanism.
 This allows the model to respond dynamically to a large range of inputs.
 After this attention block a standard multi-layer perceptron (MLP) is added.
-This constitutes the transformer block and is visualised in \Fref{fig:transformer}.
+This constitutes the transformer block and is visualised in \cref{fig:transformer}.
 
 The ability for Transformers to utilise context in surrounding input values makes them particularly suited to natural language processing (NLP).
 The meaning of words in a sentence depend on the words that surround it.
@@ -373,7 +373,7 @@ Superposition is the process of NNs representing more features than neurons with
 The features are no longer represented orthogonally in the representation space but instead share components.
 This means that if only one (sparse) feature is active the non-orthogonal features will also be partially active.
 
-The ideas of polysemanticity and superposition are represented in \Fref{fig:superposition}.
+The ideas of polysemanticity and superposition are represented in \cref{fig:superposition}.
 
 \begin{figure}
     \centering
@@ -386,7 +386,7 @@ The ideas of polysemanticity and superposition are represented in \Fref{fig:supe
 To disentangle the polysemantic neurons requires eliminating the superposition present in the model.
 This is a known problem known as ``sparse dictionary encoding'' \citep{sparse-coding} in neuroscience, in which a signal in superposition is decomposed into sparse elements.
 \citet{sae-orig} and \citet{saes} apply the idea to NNs introducing the sparse autoencoder (SAE) which enforces sparsity in its internal representation.
-The SAE module is demonstrated in \Fref{fig:sae}.
+The SAE module is demonstrated in \cref{fig:sae}.
 
 An SAE is an adaptor that takes a model layer's input and produces a replica of the layer's output.
 In comparison to the model layer the SAE has a large hidden representation dimension in which sparsity is enforced (e.g. $24576$ for GPT-2 SAEs compared to $756$ \citep{saelens}).
@@ -405,5 +405,5 @@ As \citet{saes-bad} outline, SAEs do no provide a base truth for how the model r
 This means that using SAEs to extract concepts, or in the case of the project, using SAEs to evaluate the success of an adaptor will be imperfect.
 Comparing across SAE features can give an insight into how a steering adaptor changes the models representation but not necessarily \emph{what} that new representation means as a human understandable concept.
 
-The choice of metric is discussed in more detail in \Sref{sec:steering-clear}.
+The choice of metric is discussed in more detail in \cref{sec:steering-clear}.
 Inherent challenges with SAEs are not addressed but rather the analysis takes into account their limitations.

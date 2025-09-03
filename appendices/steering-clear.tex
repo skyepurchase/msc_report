@@ -66,7 +66,7 @@ I test 3 types of residual streams:
     \end{subfigure}
 \end{figure}
 
-Figures \ref{fig:nr-train-curves}, \ref{fig:r-train-curves} and \ref{fig:sr-train-curves} show the train curves for the different models.
+\cref{fig:nr-train-curves,fig:r-train-curves,fig:sr-train-curves} show the train curves for the different models.
 All of these eventually reach near 100\% accuracy.
 The best model is chosen based on best validation accuracy and is chosen on the first instance of the best validation loss.
 
@@ -89,7 +89,7 @@ The best model is chosen based on best validation accuracy and is chosen on the 
     \end{subfigure}
 \end{figure}
 
-Figures \ref{fig:nr-accuracy}, \ref{fig:r-accuracy} and \ref{fig:sr-accuracy} show the accuracy of the model across all attributes and their values.
+\cref{fig:nr-accuracy,fig:r-accuracy,fig:sr-accuracy} show the accuracy of the model across all attributes and their values.
 All other values are filled with a uniform random attribute.
 All fills are presented to show that there is no bias towards a particular fill value.
 
@@ -147,7 +147,7 @@ This plot is essentially the same across the models with minor differences in th
     \label{fig:sr-steering}
 \end{figure}
 
-Figures \ref{fig:nr-steering}, \ref{fig:r-steering} demonstrate the effect of the CAA steering on the different attribute values for the target attribute.
+\cref{fig:nr-steering,fig:r-steering} demonstrate the effect of the CAA steering on the different attribute values for the target attribute.
 The remaining attribute values are randomly selected.
 The experiment is run over a range of example values for each 20 repeats and for each experiment the mean over 100 test inputs is returned.
 
@@ -187,7 +187,7 @@ There are two metrics that I test:
     \end{subfigure}
 \end{figure}
 
-Figures \ref{fig:nr-reproduction}, \ref{fig:r-reproduction} and \ref{fig:sr-reproduction} show the attempt at reproducing the paper figures for the top-left plot in Figure 1.
+\cref{fig:nr-reproduction,fig:r-reproduction,fig:sr-reproduction} show the attempt at reproducing the paper figures for the top-left plot in Figure 1.
 This only focuses on the CAA approach.
 This uses a different metric to the paper focusing only on attribute accuracy rather than total accuracy and the trends are similar to those in the paper.
 However, these plots are still not the same as the papers plots especially as they do not use the same metric.
@@ -212,4 +212,4 @@ However, these plots are still not the same as the papers plots especially as th
     \end{subfigure}
 \end{figure}
 
-Figures \ref{fig:nr-correct}, \ref{fig:r-correct} and \ref{fig:sr-correct} show the reproduction using the stated steering metric of total accuracy across all target labels.
+\cref{fig:nr-correct,fig:r-correct,fig:sr-correct} show the reproduction using the stated steering metric of total accuracy across all target labels.

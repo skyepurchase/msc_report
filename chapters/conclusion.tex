@@ -1,8 +1,8 @@
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-\emph{In this chapter the analysis from the results chapter \Sref{ch:results} is drawn together into specific conclusions.}
-\emph{These relate back to the contributions made in the introduction chapter \Sref{sec:contributions}.}
+\emph{In this chapter the analysis from the results \cref{ch:results} is drawn together into specific conclusions.}
+\emph{These relate back to the contributions made in \cref{sec:contributions}.}
 \emph{Important results are highlighted and their limitations discussed.}
 
 \emph{A detailed discussion of the limitations of this project are presented.}
@@ -22,7 +22,7 @@ Clear examples include minimally modified counterfactuals \citep{mimic} which wa
 This project already demonstrates the wide performance range of the few commonly used adaptors, analysing the performance of more adaptors would give a better overview of representation engineering as a whole.
 
 Finally the datasets used are small, both in the number of examples and in the number of distinct sets.
-Only 5 different sets were used to generate the results in \Sref{sec:prompt-pairs-res} each with at most 3000 unique prompts.
+Only 5 different sets were used to generate the results in \cref{sec:prompt-pairs-res} each with at most 3000 unique prompts.
 This fails to completely capture the full range of representations that the model may contain.
 Considering that the sparse autoencoder dimension for GPT-2 is 24576 \citep{saelens} 5 datasets are unlikely to encompass all concepts present in the model representation.
 
@@ -38,7 +38,7 @@ Datasets such as the model written evaluations \citep[MWE]{mwe} provide a large 
 The argument for MCQs is that the possible answer tokens (``A'', ``B'' or ``yes'', ``no'') contain the full context of the question being asked \citep{steering-taxonomy}.
 Potentially utilising a mixture of MCQs and free text answers can provide more insight into how best to implement steering adaptors.
 
-Given the problems of superposition \Sref{sec:sae} that are inherent in large language models it is possible that the number of examples required to effectively steer models is larger than those presented here.
+Given the problems of superposition \cref{sec:sae} that are inherent in large language models it is possible that the number of examples required to effectively steer models is larger than those presented here.
 Datasets such as MWE contain only $\sim 1000$ examples and in some cases provide enough examples to effectively steer concepts \citep{steerability}.
 Regardless, expanding the number of examples may provide further insight into the claims of \citet{steering-clear} about the embedding dimension, density of concepts, and number of required steering examples.
 

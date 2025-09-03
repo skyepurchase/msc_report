@@ -9,7 +9,7 @@
 \emph{The differences between this project and the related work is explained.}
 
 \emph{Finally the contributions which this project make to the field are detailed.}
-\emph{This contributions are justified during the results chapter \Sref{ch:results} and reiterated in the conclusion chapter \Sref{ch:conclusion}.}
+\emph{These contributions are justified in \cref{ch:results} and reiterated in \cref{ch:conclusion}.}
 
 \section{Motivation}
 
@@ -70,7 +70,7 @@ The laptop has 16GB of memory with an 8 core Intel 13$^{th}$ generation i7 proce
 
 Preliminary tests of the experiments run in this project were done on this laptop.
 However, the official results were run on \href{https://www.runpod.io/}{RunPod}, which provides a suite of possible GPU environments.
-For all the results presented in \Sref{ch:results} the RTX 2000 Ada environment was used.
+For all the results presented in \cref{ch:results} the RTX 2000 Ada environment was used.
 This environment includes a single RTX 2000 Ada GPU with 16GB of VRAM, 31GB of RAM, and 6 virtual CPUs.
 The cost to run this environment was \$0.24 per hour.
 The funding for the compute environment was provided by my supervisor through the \href{https://www.matsprogram.org/}{ML Alignment and Theory Scholarship} which he is part of.
@@ -80,13 +80,13 @@ No results presented in this report were generated from these runs.
 
 \section{Generative AI Disclosure}
 
-This project aims to steer generative AI models (genAI) such as GPT 2 \citep{gpt-2} and thus genAI was used in generating the raw results presented in \Sref{ch:results}.
+This project aims to steer generative AI models (genAI) such as GPT 2 \citep{gpt-2} and thus genAI was used in generating the raw results presented in \cref{ch:results}.
 
-However, outside of the direct prompting of agents to analyse the steering adaptors presented in \Sref{ch:background}, no generative AI was used throughout the project or report.
+However, outside of the direct prompting of agents to analyse the steering adaptors presented in \cref{ch:background}, no generative AI was used throughout the project or report.
 There are two exceptions:
 \begin{itemize}[nolistsep]
-    \item Generating a dataset of prompt-completion templates detailed in \Aref{app:prompt-pairs}.
-    \item Generating a random point cloud in Tikz for \Fref{fig:caa}.
+    \item Generating a dataset of prompt-completion templates detailed in \cref{app:prompt-pairs}.
+    \item Generating a random point cloud in Tikz for \cref{fig:caa}.
 \end{itemize}
 
 Spellcheck was performed by Neovim and its built in spellchecker with no use of AI tools such as Grammarly.
@@ -103,7 +103,7 @@ aim to analyse steering in a toy environment where they are able to control the 
 They compare a range of steering techniques \citep{caa, reft, mimic} against each other in a controlled setting to focus on the effect of steering example size.
 Inspired by the low-rank representation finetuning \citep[LoReFT]{reft} (A steering adaptor which steers representations in a projected, low-rank space) they introduce their own technique, low-rank representation steering (LoReST), and demonstrate competitive performance to the other techniques.
 
-To verify this work, this thesis reproduces the same toy environment described in \Sref{sec:steering-clear} and validates the conclusions drawn.
+To verify this work, this thesis reproduces the same toy environment described in \cref{sec:steering-clear} and validates the conclusions drawn.
 Additionally, this reproduction introduces the affine concept editing adaptor proposed by \citet{ace} to compare against the adaptors used in \citet{steering-clear}.
 This thesis then expands the analysis to LLMs and demonstrates similar adaptor performance in relation to the number of training examples suggesting the same preference for low-rank methods in the large data regime and affine methods in the small data regime.
 Furthermore, this thesis shows the consistency of LoReST in both data regimes.
@@ -118,7 +118,7 @@ Building on their work this project aims to analyse a larger range of techniques
 Furthermore, the properties of training datasets is analysed in more depth to determine which properties cause steering techniques to fail.
 
 In this thesis, rather than use model written evaluations \citep{mwe} a new set of steering datasets is generated with more fine grain control.
-The construction of these datasets is described in \Sref{sec:prompt-pairs}.
+The construction of these datasets is described in \cref{sec:prompt-pairs}.
 
 \smalltitle{\citet{steering-taxonomy}}
 present a full taxonomy of current steering vector approaches (more generally \emph{representation engineering}).
@@ -138,12 +138,12 @@ This process works by ``reversing'' the SAE procedure and converting concepts in
 
 This thesis, in contrast, uses the SAE features to evaluate models on free-text responses rather than utilising SAEs to steer the model.
 The SAE features provide a metric to evaluate how well the models internal representation has been effectively steered.
-A detailed description of SAEs is provided in \Sref{sec:sae} and their use in this project is described in \Sref{sec:prompt-pairs}.
+A detailed description of SAEs is provided in \cref{sec:sae} and their use in this project is described in \cref{sec:prompt-pairs}.
 
 \section{Contributions}
 \label{sec:contributions}
 
-In answering the questions posed in \Sref{sec:questions} this project provides the following contributions
+In answering the questions posed in \cref{sec:questions} this project provides the following contributions
 \begin{itemize}[nolistsep]
     \item Verification of the results presented by \citet{steering-clear} in their toy experiment.
     \item Comparison of contrastive activation addition \citep[CAA]{caa}, affine concept editing \citep[ACE]{ace}, LoReFT and LoReST on large language models.
