@@ -125,21 +125,47 @@ The mean steering metric over the range of datasets is presented to prevent bias
 \smalltitle{Steering metrics.} Unlike the {\scshape Steering Clear} environment \cref{sec:steering-clear}, it is hard to quantify accuracy on the steered attribute as free-text does not have a clear accuracy metric.
 Instead, this thesis proposes 3 metrics to evaluate the success of the steering approach.
 \begin{itemize}[nolistsep]
-    \item Mean target SAE feature activation.
-    \item Mean spurious SEA feature activation. That is, SAE features that are not activated by either positive or negative examples.
+    \item Proportion of target SAE features activated.
+    \item Proportion of spurious SAE features activated. Spurious features being those were are not activated by either positive or negative examples.
     \item Semantic similarity between the generated output and the target phrase.
 \end{itemize}
 Along with the analysis of the adaptor performance the suitability of the metrics is also discussed.
 The SAE metrics provide insight into how the models internal representation has changed whilst verifying only the target concepts have been altered.
 The semantic similarity metric verifies that the observed behaviour has also changed and not just how the model represents concepts.
 
-The SAE features for each dataset are chosen during the preprocessing step, when model activations are extracted for adaptor training.
-Model extraction is achieved by saving the model's internal representation at a specific layer to an external file.
-During this step the SAE features which are consistently active across all positive examples (including test examples) are chosen as the target features.
-The exact interpretation of these features is not important, simply that the SAE features represent the models representation of positive behaviour.
-Similarly, the SAE features which do not activate across \emph{both} positive and negative features are noted.
-A random selection of these features are chosen as the spurious feature set.
-Together these provide insight into how well the adaptor steers the internal model representations towards the intended behaviour without effecting unrelated concepts and behaviours.
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/positive_sae_acts.pdf}
+    \caption{
+        The average SAE feature activation on the last token across all the positive examples for a specific dataset.
+        Note that the lines are thicker than the space on the x axis so that they are visible, in reality the average feature activation is sparser than it appears.
+    }
+    \label{fig:pos-sae}
+\end{figure}
+
+To evaluate how well the model steers the models internal representation recall the representation of an SAE activation in \cref{fig:sae-acts}.
+A similar activation is presented in \cref{fig:pos-sae} except the figure presents \emph{an average} of all SAE activations for the positive examples.
+A successful model would result in the models internal representation matching these concepts and therefore activating the same SAE features.
+Therefore, the first metric calculates the proportion of the positive SAE features (those visualised in \cref{fig:pos-sae}) that the adaptor activates (e.g. those in \cref{fig:sae-acts}).\footnote{The phrase ``the adaptor activates'' means the SAE feature activations of the model when the adaptor is applied.}
+
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/combined_sae_acts.pdf}
+    \caption{
+        The combined average SAE feature activation on the last token across all examples for a specific dataset.
+        Note that the lines are thicker than the space on the x axis so that they are visible, in reality the average feature activation is sparser than it appears.
+    }
+    \label{fig:comb-sae}
+\end{figure}
+
+It is important to ensure the model only affects the concepts present in the prompt and that which is being steered.
+\cref{fig:comb-sae} shows the combined SAE feature activations for both the negative and positive examples.
+There is a lot of overlap, relating to features that are activated by both examples (the context of the prompt), and some differences (the features specific to the positive and negative examples).
+When steering the adaptor is likely to activate some or all of these features.
+However, the adaptor should not activate the unactivated features as these are not correlated to either the prompt context or the steered concept.
+The second metric captures this by calculating the proportion of this unactivated SAE features that the adaptor activates.
 
 To calculate semantic similarity the model output is embedded into a vector space where distance represents semantic similarity.
 This is achieved using Distilbert \citep{distilbert} which embeds text into vectors that preserve the semantics of the input text.

@@ -10,6 +10,21 @@
 \emph{Finally further work that can be carried is presented.}
 \emph{These directions are based on the findings of the project or areas that were not explored due to various constraints.}
 
+In this thesis the findings of \citet{steering-clear} where reproduced and attempted at a larger scale for large language models (LLMs).
+This provided a large scale comparison of four common steering adaptors across a range of dataset sizes and hyperparameter choices.
+To aid in this analysis three metrics where proposed based on sparse autoencoders and semantic similarity.
+
+The findings demonstrate that \cites{steering-clear} suggestion that a clear improvement occurs when the dataset matches the activation dimension does not hold.
+However, this is likely due to the superposition inherent in the LLM which would require further theory.
+
+The three metrics provide a promising direction to compare steering adaptors for a given task or model.
+They unfortunately require a fully trained SAE for the target model which is likely impractical in most cases.
+But as \citet{saes-bad} suggest SAEs continue to provide insights into the correlations within a dataset.
+
+Finally, the work carried out suggests that in most cases for short sentence completion that CAA is ideal.
+However, for longer form content where the grammatical structure is important LoReST is ideal.
+It is possible that in the right setting ACE would perform well, however, it is not universally favoured.
+
 \section{Limitations}
 
 The primary limitation of the project is the compute cost and time which necessitated using GPT-2 which has a limited ability for high-level reasoning.
@@ -28,7 +43,7 @@ Considering that the sparse autoencoder dimension for GPT-2 is 24576 \citep{sael
 
 \section{Future Work}
 
-Using a larger model such as Gemma \citep{gemma}, Llama 3 \citep{llama3} or GPT-5 \citep{gpt-5} (all of which have over 7 billion parameters compared to GPT-2 with 1.5 billion \citep{gpt2-1.5}) which have been instruction tuned would provide more real-world applicable results.
+Using a larger model such as Gemma \citep{gemma}, Llama 3 \citep{llama3} or GPT-5 \citep{gpt-5} (all of which have over 7 billion parameters compared to GPT-2 with 1.5 billion \citep{gpt-2}) which have been instruction tuned would provide more real-world applicable results.
 These models have also shown to perform far better than GPT-2 on text completion and knowledge acquisition.
 With more compute it would be possible to extend the experiments in this project to these larger models.
 This will also provide better analysis of affine concept editing \citep[ACE]{ace} as this method was originally developed for models such as Llama 3.

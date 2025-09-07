@@ -36,7 +36,7 @@ Frequently the set of set of activations will be the positive activation or nega
 \section{Model Alignment}
 
 As models increase in capabilities \citep{dynabench, hle, gpt-5, grok-4} they pose an increasing risk to their users \citep{c.ai, psychosis} and potentially humanity at large \citep{survellience, deepfakes, disempowerment}.
-The underlying issue is that these models may be \emph{misaligned} \citep{agent-alignment}, that is to say they do not behaviour in line with users intentions.
+The underlying issue is that these models may be \emph{misaligned} \citep{agent-alignment}, that is to say they do not behaviour inline with users intentions.
 The problem of aligning models is referred to as the \emph{alignment problem} or, within reinforcement learning \cite{rl}, the \emph{agent alignment problem} \citep{agent-alignment}.\footnote{An \emph{agent} is a reinforcement learning term for any entity that interacts with a learning environment and updates it's internal state to better achieve a predetermined goal. In this case, the model behaves as an agent.}
 
 \citet{agent-alignment} present the agent alignment problem and propose \emph{reward modelling} as a potential avenue to align agents.
@@ -187,10 +187,10 @@ This approach uses a small set of parameters that augment a model layers output,
 Rather than finetuning a model, LoReFT edits the representations of the model, equivalent to steering.
 To reduce the parameter count this learnable steering is performed in a low-rank space.
 The specific approach is based on the distributed interchange intervention \citep[DII]{dii}.
-DII is a version of interchange intervention whereby a causal model (with human understanable structure) is aligned with a neural network (NN) that exhibits the same behaviour.
+DII is a version of interchange intervention whereby a causal model (with human understandable structure) is aligned with a neural network (NN) that exhibits the same behaviour.
 By identifying possible neurons that exhibit the same behaviour as intermediate nodes in the causal model it is possible to intervene with the neuron's value across different inputs and verify the output behaviour matches how the causal model behaves.
-This is very similar to the goal of steering adaptors except there is no associated causal model, simply an alignment goal.
-Rather than brute-force search for the corresponding neuron for a causal node, \citet{dii} suggest projecting the respresentations into a lower dimensional space, comparing the causal node value and the NNs neuron, then projecting back.
+This is a very similar to that of steering adaptors except there is no associated causal model, simply an alignment goal.
+Rather than brute-force search for a causal node's corresponding neuron, \citet{dii} suggest projecting the respresentations into a lower dimensional space, comparing the causal node value and the NNs neuron, then projecting back.
 \citet{reft} present the following form of DII for the case of representation finetuning.
 \begin{equation*}
     DII(\vx,\vy,\mR) = \vx + \mR^T(\mR\vy - \mR\vx)
@@ -205,7 +205,7 @@ where $\mR \in \mathbb{R}^{r\times d}$ is a low-rank projection matrix.
      \label{fig:loreft}
 \end{figure}
 
-\citet{reft} suggest replacing $\mR\vy$ with an affine transformation $\mW\vx + \vb$.
+\citet{reft} then suggest replacing $\mR\vy$ with an affine transformation $\mW\vx + \vb$.
 Thus, the adaptor learns a transformation, $\mR\va^+ = \mW\va^- + \vb$, from negative activations to positive low-rank representations.
 In this way the adaptor can learn low-rank representations of activations that encapsulate the desired behaviour and adjust the activations in a parameter efficient space.
 The approach is therefore a \emph{low-rank representation finetuning} (LoReFT) adaptor.
@@ -388,9 +388,21 @@ This is a known problem known as ``sparse dictionary encoding'' \citep{sparse-co
 \citet{sae-orig} and \citet{saes} apply the idea to NNs introducing the sparse autoencoder (SAE) which enforces sparsity in its internal representation.
 The SAE module is demonstrated in \cref{fig:sae}.
 
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/sae_acts.pdf}
+    \caption{
+        The SAE feature activations for a sample prompt. Each line represents an activated feature, the bar along the bottom represents no activation.
+        The lines are approximately double the thickness they would occupy for visual aid.
+    }
+    \label{fig:sae-acts}
+\end{figure}
+
 An SAE is an adaptor that takes a model layer's input and produces a replica of the layer's output.
 In comparison to the model layer the SAE has a large hidden representation dimension in which sparsity is enforced (e.g. $24576$ for GPT-2 SAEs compared to $756$ \citep{saelens}).
 This can be achieved in multiple ways such as clamping to the $k$ highest activations \citep{k-sparsity} or adding a sparsity regularising loss.
+An example of an SAE activation is presented in \cref{fig:sae-acts} demonstrating the sparsity of the vector.
 After training the elements of the SAE hidden dimension are given interpretations to better understand the model.
 It is worth noting that SAEs have been shown to demonstrate subpar performance when used for interpretability \citep{saes-bad}.
 In contrast, this thesis utilises SAEs to track model representation changes and spurious correlations, a use case \citet{saes-bad} suggest is still valid.

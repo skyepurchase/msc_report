@@ -1,18 +1,16 @@
 \chapter{Results}
 \label{ch:results}
 
-\emph{In this chapter the results of the experiments and methods detailed in \cref{ch:background,ch:methodology} are presented.}
+\emph{In this chapter the results of the experiments and methods detailed in Chapters \S\ref{ch:background} and \S\ref{ch:methodology} are presented.}
 \emph{A detailed analysis of the results is included along with references to similar results within the literature.}
 \emph{Both quantitative and qualitative analysis is carried out and the limitations of the metrics used are discussed.}
 
 \emph{First, the reproduction of {\scshape Steering Clear} \citep{steering-clear} detailed in \cref{sec:steering-clear} is presented.}
 \emph{Comparisons to the original paper are made along with additional analysis.}
-\emph{This provides hypotheses about how the same adaptors will behave in the natural language setting of LLMs \cref{sec:prompt-pairs}.}
 
 \emph{Finally, the natural language setting described in \cref{sec:prompt-pairs} is analysed.}
-\emph{A comparison to the {\scshape Steering Clear} toy environment is made focusing on the hypotheses proposed.}
-\emph{Additionally, an in depth analysis of the hyperparameter choice in comparison to the toy environment is carried out.}
-\emph{This provides potential further avenues of research and implications of superposition \cref{sec:sae} on steering adaptors.}
+\emph{A comparison to the {\scshape Steering Clear} toy environment is made.}
+\emph{The suitability of the quantitative metrics proposed in \cref{sec:prompt-pairs} is discussed.}
 
 \section{{\scshape Steering Clear} Reproduction}
 \label{sec:steering-clear-res}
@@ -21,7 +19,7 @@ The results of the reproduction suggest that the analysis by \citet{steering-cle
 
 \begin{figure}
     \centering
-    \captionsetup{width=\textwidth}
+    \captionsetup{width=.9\textwidth}
     \includegraphics[width=\textwidth]{figures/steering_clear.pdf}
     \caption{
         The average accuracy of the steered model predicting the correct attribute value, in all cases this is $\mu_1$ (see \cref{sec:steering-clear}).
@@ -40,7 +38,7 @@ A full discussion of the different metric and why this was used is presented in 
 The figure clearly shows a difference between the linear/affine methods of CAA \& ACE and the low-rank methods of LoReFT \& LoReST.
 In the limit of more examples both low-rank methods achieve near 100\% success rate in steering the target attribute to the target value.
 In comparison the affine methods reach an asymptote ($\sim 0.8$ for most hyperparameters) which does not increase with more training examples.
-Importantly, in the low training example setting both LoReFT performs worse than both CAA and ACE.
+Importantly, in the low training example setting LoReFT performs worse than both CAA and ACE.
 In fact, it performs worse than the model without steering.
 This is due to the requirement to train parameters which both affine approaches lack.
 However, the addition of parameters allows the method to perform better as more examples are presented.
@@ -61,181 +59,148 @@ This means in the low data regime it behaves closer to ACE and CAA relying on th
 This is supported by the fact that LoReST achieves an accuracy of $\sim 0.8$ with 4 examples matching CAA, and then LoReST then continues to increase in accuracy eventually plateauing at the same accuracy as LoReFT, $\sim 1.0$.
 This behaviour matches those presented in \citet{steering-clear}.
 
+\subsection{The Issue of Variance}
+
+The variance of the adaptors was not considered in \citet{steering-clear} even though, as \cref{fig:steering-clear} demonstrates, this can be quite high.
+The variance that is presented in \cref{fig:steering-clear} is the standard deviation (std) across the 20 runs, this has been clipped to fit in the range 0-1.\footnote{This problem is due to the skewed success distribution.}
+\citet{steerability} demonstrate that, when considering the std of the adaptors, many datasets that appear steerable have a significant chance of failing.
+
+It is very important to consider the variance as the use case of steering vectors requires a high rate of success.
+This is especially the case when the variability includes steering in the \emph{opposite} direction.
+
+As \cref{fig:steering-clear} demonstrates the affine methods have the highest std.
+This is expected as these methods rely primarily on the means of the sampled steering examples which can vary a lot especially in the low data regime.
+
+In the case of CAA the mean std is $0.28$, this means that for $\lambda \in [3..5]$ the adaptor performs anywhere from as low as $0.5$ accuracy up to $1.0$ accuracy.
+Similarly, ACE has a mean std of $0.30$ which has a similar effect as CAA.
+
+This is in contrast to the low rank approaches which have a tighter std especially LoReST.
+In the case of LoReFT the mean std is $0.15$ half that of the affine methods.
+Furthermore, this increases with the number of examples with only 4 examples the mean std is $0.05$ whereas for 4096 the mean std is $0.26$.
+
+LoReST has the best variance with a mean std of $0.08$.
+Ignoring $rank=1$, which has the worst variance, results in a mean std of $0.06$ which decreases substantially after 16 examples down to a mean std of $0.04$.
+
+All together this suggests that LoReST is the ideal adaptor as it has a large success range regarding the number of provided examples whilst exhibiting very low variance in success.
+As is demonstrated in the next section LoReST continues to have the lowest variance but does not fair well on LLMs.
+
 \section{Prompt Pairs}
 \label{sec:prompt-pairs-res}
 
 \subsection{Quantitative Analysis}
 \label{sec:quant}
 
-Recall the three metrics defined in \cref{sec:prompt-pairs} of target SAE feature activation, spurious SAE feature activation and semantic similarity.
+Recall the three metrics defined in \cref{sec:prompt-pairs} of target SAE feature activation proportion, spurious SAE feature activation proportion and semantic similarity.
 As there is no notion of accuracy akin to \citet{steering-clear} the closest comparison comes from the activation of SAE features.
 To avoid indiscriminate increase across all SAE features, the spurious SAE features verifies the model only affects the target concepts.
 
-\subsubsection{SAE Target Feature Activation}
+The two SAE metrics are presented together for each adaptor.
+This presents a full picture of how discriminating the model is towards the desired concept.
+The target behaviour would be for high target SAE proportion, close to 1, and low spurious SAE proportion, close to 0.
+This would suggest the adaptor successfully steers the model towards the target concepts without effecting the features that are not related to the context.
+
+\subsubsection{CAA}
 
 \begin{figure}
     \centering
-    \captionsetup{width=\textwidth}
-    \includegraphics[width=\textwidth]{figures/gpt2_7_target.pdf}
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_caa.pdf}
     \caption{
-        The average activation of target SAE features at the model completion tokens.
-        This represents how well the adaptor positively changed the models representation, \emph{higher} values are better.
-        The y axis is a symmetric logarithm scale where the range $[0,1]$ is linear, this section is highlighted in grey.
-        The same range of examples is used across all adaptors.
+        The proportion of target SAE features that were activated by CAA as a function of the number of steering examples, alongside the proportion of spurious SAE features that were activated by CAA.
+        Higher target SAE proportion and lower spurious SAE proportion is better.
     }
-    \label{fig:gpt-pp-target}
+    \label{fig:gpt-caa}
 \end{figure}
 
-\cref{fig:gpt-pp-target} presents the results of the first metric, the average activation of the target SAE features.
-As discussed in \cref{sec:prompt-pairs} the target SAE features are the SAE features that had the highest, average activation across all positive examples.
-For this reason, a successful adaptor should increase the activation of these SAE features from the model with no intervention.
+\cref{fig:gpt-caa} presents the two SAE metrics for CAA good performance.
+This closely matches the behaviour that was seen in \citet{steering-clear} with the higher ranks performing better.
 
-The figure uses a symmetric logarithmic scale where the range -1 to 1 is linear and all other regions are logarithmic.
-The symmetric logarithmic scale is used as the activations range from 0 exponentially up to 1000 and 0 is not representable on a standard logarithmic scale.
-The linear region of the plot is highlighted in gray and a horizontal grid is provided to demonstrate the difference.
+The inclusion of the spurious feature metric demonstrates a key tradeoff when steering models.
+The stronger the intervention the more the target representation is present but the more spurious representations are also present.
+Compare $\lambda = 5$, which has a target feature proportion of $0.40 \pm 0.11$ and spurious proportion of $0.19 \pm 0.07$, with $\lambda = 1$, which has a target proportion of $0.06 \pm 0.03$ and spurious of $0.01 \pm 0.00$.
 
-From the figure most methods provide some level of improvement regardless of hyperparameter choice, however, LoReST does not provide a significant improvement compared to the others.
-However, the results presented do not match those those of \citet{steering-clear} where low-rank methods consistently outperform affine methods.
-This demonstrates that though useful insight is gained from the toy setup of \textsc{Steering Clear} this does not lead to predictable results in the natural language setting.
-The primary outliers are ACE and LoReST.
+Though CAA does not achieve a target proportion above $0.5$ recall the definition of the metric in \cref{sec:prompt-pairs}.
+The average SAE activation vector is far less sparse than a single activation vector, therefore the output SAE vector is likely to only activate a small fraction of the average SAE activations.
 
-\smalltitle{CAA} matches the behaviour in the steering clear environment \cref{sec:steering-clear}.
-There is a clear increase in effectiveness as the steering magnitude $\lambda$ increases and the performance is constant across the number examples with minor fluctuations.
+As with \citet{steering-clear} the metric remains consistent across the number of steering examples.
+Take $\lambda = 5$ the standard deviation in the mean is only $0.00002$ for the target features and $0.0001$ for the spurious features.
 
-In the case of $\lambda = 5$ the adaptor achieves an average SAE activation of $46.7 \pm 7.8$ across the range of training examples.
-In the case of $\lambda = 1$ the adaptor achieves an average of $1.2 \pm 0.01$.
-This demonstrates a very consistent value across the number of examples regardless of hyperparameter.
-However, the larger the parameter the greater the variance in the exact SAE feature activation.
-
-In comparison to CAA in \citet{steering-clear}, presented in \cref{fig:steering-clear}, the same behaviour is observed.
-A consistent value across the number of steering examples with a clear threshold above $\lambda = 1$.
-This suggests that in unseen examples the CAA adaptor has to overcompensate and perturb the representation further in representation space than what was learnt.
-
-\smalltitle{ACE} does not behave as expected or in line with the findings presented in \cref{sec:steering-clear-res}.
-The hyperparameter does not change the target activation significantly and across trained examples the average activation value decreases.
-The method, however, has the highest average target activation by an order of magnitude compared to the next best adaptor.
-This is accompanied by the largest variance across the adaptors, at its best ACE achieves a feature activation of $2187$ but has a standard deviation of $2912$.
-This variance is consistent across the range of training examples.
-The problem of variability across all the adaptors is discussed further in \cref{sec:variability}.
-
-Given that \citet{ace} demonstrate impressive performance of ACE on Llama 3 \citep{llama3} and the comparable performance of ACE and CAA in \cref{fig:steering-clear} it is likely that the task, the model or the metric are ill suited to the adaptor.
-The emergent properties present in larger models such as Llama 3 \citep{llama3} and GPT 5 \citep{gpt-5} are not as prominent in the smaller GPT 2 \citep{gpt-2} model.
-It is possible that across positive and negative examples there is not a clear, meaningful baseline from which ACE can consistently steer from.
-This could be due to the completions involving free-text answers that have a range of interpretations that may not align with the desired interpretation.
-
-\smalltitle{LoReFT} behaves according to \citet{steering-clear}.
-In particular there is a clear increase in target feature activation as the number of examples increases until a threshold point from which the adaptor does not improve.
-
-In the majority of hyperparameter choices the best performance occurred between 128 and 512 examples.
-This does not line up with the predictions of \citet{steering-clear} who found that the point of best performance occurred when the number of examples matched the activation dimension.
-In \cref{fig:gpt-pp-target} the activation dimension of GPT-2 is 756 \citep{saelens} compared to the optimal performance occurring at 128-512 examples.
-
-The key differences between the toy setup and this environment is the added complexity of superposition \cref{sec:sae}.
-However, this would suggest that superposition \emph{decreases} the number of required examples to successfully steer.
-Another possibility is the rank of the adaptor is too small to accurately steer the model.
-This is supported by the fact that the average feature activation decreases rather than plateaus similar to the small rank examples in \cref{fig:steering-clear} (see $rank=1, 2$).
-
-LoReFT at its optimal is comparable to CAA achieving an average feature activation of $42.8 \pm 37.2$ in comparison to CAA with $49.3 \pm 26.3$.
-However, in comparison to CAA, LoReFT requires careful tuning of the hyperparameter and the number of examples provided.
-This behaviour is seen both in this realistic environment and the toy environment \cref{sec:steering-clear-res}.
-
-\smalltitle{LoReST} does not follow the trend presented in \citet{steering-clear}.
-In comparison to \cref{fig:steering-clear} there is no clear increase in the chosen metric as the number of examples increase.
-Furthermore, the optimal rank appears to be $3$ rather than the larger ranks as anticipated.
-Even the optimal rank of $3$ appears to perform worse that CAA with LoReST's average of $1.17 \pm 0.03$ compared to $1.21 \pm 0.01$ for CAA.
-
-From \cref{fig:steering-clear} it may be expected that the exact rank of LoReST has limited effect on the performance of the adaptor.
-However, the results in \cref{fig:steering-clear} suggest that there is a hyperparameter threshold above which the adaptor performs similarly \emph{but} higher values are not necessarily better.
+\subsubsection{ACE}
 
 \begin{figure}
     \centering
-    \captionsetup{width=\textwidth}
-    \includegraphics[width=\textwidth]{figures/gpt2_7_unrelated.pdf}
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_ace.pdf}
     \caption{
-        The average activation of unrelated SAE features at the model completion tokens.
-        This represents how well the adaptor did not interfere, \emph{lower} values are better.
-        The y axis is a symmetric logarithm scale where the range $[0,1]$ is linear, this section is highlighted in grey.
-        This demonstrates that all but ACE achieve 0 interference in some instances.
-        The same range of examples is used across all adaptors.
+        The proportion of target SAE features that were activated by ACE as a function of the number of steering examples, alongside the proportion of spurious SAE features that were activated by ACE.
+        Higher target SAE proportion and lower spurious SAE proportion is better.
     }
-    \label{fig:gpt-pp-unrelated}
+    \label{fig:gpt-ace}
 \end{figure}
 
-Unlike the other adaptors presented here LoReST has not be thoroughly applied to large language models (LLMs).
-It is possible that this approach, though based on adaptors such as LoReFT, is not suitable.
-\emph{However}, as demonstrated in both \cref{fig:gpt-pp-unrelated} and \cref{sec:qual} the seemingly poor performance of LoReST suggests that feature activation alone is a poor metric for assessing success of a steering adaptor.
+The two SAE metrics for ACE are presented in cref{fig:gpt-ace}.
+Unlike in \citet{ace} and the results in \cref{fig:steering-clear} ACE appears to perform very badly.
+It is able to achieve a promising target feature proportion of $0.35$ however this is accompanied by a spurious feature proportion of $0.49$.
+This means that ACE is introducing more spurious features than it is aligning towards target features.
 
-\subsubsection{SAE Spurious Feature Activation}
+The reason for this is unclear as \citet{ace} show promising results for the adaptor and \cref{fig:steering-clear} suggests the method can work.
+The issue is likely with the model used, GPT-2, rather than the one used in \citet{ace}, Llama 3 \citep{llama3}.
+GPT-2, though able to produce fairly coherent English sentences does not have the reasoning capabilities of larger models such as Llama 3.
+For this reason the internal representations likely do not have a meaningful baseline for ACE to utilise.
 
-\cref{fig:gpt-pp-unrelated} presents the results of the second metric, the average activation of the spurious SAE features.
-As discussed in \cref{sec:prompt-pairs} the spurious SAE features are the SAE features that where not activated in either the positive or negative examples.
-These features represent concepts that are, in theory, unrelated to concepts represented across the example prompts.
-Only a random sample is considered rather than the entirety of spurious features which is usually fairly large.
-For this reason, a successful adaptor should not activate any of these features resulting in an average of 0, in general a low or decreasing average activation is expected.
+\subsubsection{LoReFT}
 
-Following \cref{fig:gpt-pp-target} the figure uses a symmetric log plot with the same linear region highlighted.
-This is particularly important in this case as the majority of values are expected to be 0, however certain adaptors can result in very large activations.
-The same scale as \cref{fig:gpt-pp-target} is used for comparison.
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_loreft.pdf}
+    \caption{
+        The proportion of target SAE features that were activated by LoReFT as a function of the number of steering examples, alongside the proportion of spurious SAE features that were activated by LoReFT.
+        Higher target SAE proportion and lower spurious SAE proportion is better.
+    }
+    \label{fig:gpt-loreft}
+\end{figure}
 
-Comparing against \cref{fig:gpt-pp-target}, \cref{fig:gpt-pp-unrelated} demonstrates a different set of benefits to each of the adaptors.
-In particular, the two figures show the trade offs between high target feature activation and low spurious feature activation.
-From this plot it is clear to see how well LoReST is able to accurately manipulate the models internal representations.
+In comparison to the \textsc{Steering Clear} environment the low rank methods appear to perform worse in regards to the SAE metrics.
+The results for LoReFT are presented in \cref{fig:gpt-loreft} and demonstrate a lower target feature activation in comparison to both affine approaches.
 
-\smalltitle{CAA} performs very well considering both metrics.
-The adaptor is able to increase the target SAE feature activation whilst maintaining a suitably low spurious feature activation.
-This suggests that the adaptor is able to precisely manipulate the internal representation along the desired concept.
+The best performing rank is $rank = 30$ with 256 examples which achieves $0.31 \pm 0.15$ target feature proportion in comparison to CAA which achieves $0.40 \pm 0.11$.
+The spurious feature proportion for $rank = 30$ is $0.23 \pm 0.10$ also higher than CAA with $0.19 \pm 0.07$.
 
-As stated previously it achieves a target feature activation of up to $49.3$ but also has a maximum spurious feature activation of $0.45 \pm 0.87$ when $\lambda = 5$.
-In the case of $\lambda = 3$ the target feature activation is $22.3 \pm 14.6$ with spurious feature activation $0.0012 \pm 0.0002$.
-As with the target feature activation there is still a substantial amount of variance in the spurious feature activation.
+The potential benefit of LoReFT occurs at the larger values where the spurious feature proportion drops but the target proportion remains relatively high.
+For example, with $rank = 60$ the target proportion is $0.14 \pm 0.06$ and the spurious proportion is $0.04 \pm 0.02$.
+Compare this to CAA where $\lambda = 5$ has a better target proportion, $0.40 \pm 0.11$, but a worse spurious proportion, $0.19 \pm 0.06$.
+This does come at the cost of having to tune hyperparameters for LoReFT.
 
-The large spurious feature activation for $\lambda = 5$ in comparison to the other hyperparameters can be attributed to the linear nature of the adaptor.
-When the steering vector magnitude is too large it is likely to push the representation outside of the desired representation space.
-This can have unintended consequences as shown here, where other concepts that were not intended are boosted.
-For this reason it is expected for affine methods to perform worse than low rank methods that can perform more complex manipulations.
+It is possible with a higher rank LoReFT may perform much better.
+Given the trends seen in \cref{fig:steering-clear} it is unlikely more examples will help as after 256 examples the approach plateaus.
 
-\smalltitle{ACE} demonstrates further problems as it maintains a high activation for spurious features.
-Similar to \cref{fig:gpt-pp-target} there is a high variance in the activation.
-Together these plots demonstrate a high level of inconsistency across the different datasets and the number examples.
+\subsubsection{LoReST}
 
-It is possible that in certain circumstances ACE performs very well achieving a very high target feature activation and near 0 spurious feature activation.
-However, the inconsistency means that this is would be hard to account for when using the adaptor.
+\begin{figure}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \includegraphics[width=\textwidth]{figures/gpt2_7_lorest.pdf}
+    \caption{
+        The proportion of target SAE features that were activated by LoReST as a function of the number of steering examples, alongside the proportion of spurious SAE features that were activated by LoReST.
+        Higher target SAE proportion and lower spurious SAE proportion is better.
+    }
+    \label{fig:gpt-lorest}
+\end{figure}
 
-As discussed previously this is likely due to the tasks and the specific model (GPT-2) in use.
-The tasks do not provide strong context for the model such that negative and positive examples are clearly distinguishable.
-Furthermore, the model may not have strong internal representations that include context of the full prompt and rather focus on the embeddings of the target word.
+\cref{fig:gpt-lorest} presents the two SAE metrics achieved by LoReST.
+Compared to the previous 3 approaches this suggests very poor performance from LoReST.
+All ranks appear to perform at the same level reaching only $0.05 \pm 0.00$ on average across all hyperparameters.
+This is marginally above the baseline value of $0.02 \pm 0.00$.
 
-\smalltitle{LoReFT} behaves similarly to \cref{fig:gpt-pp-target} but with significant sections of 0 spurious feature activations.
-The highest spurious feature activation occurs at 256 examples for $rank = 60$ reaching $2.2 \pm 3.1$ above CAA with $1.2 \pm 2.2$.
-This aligns with the maximum target activation which occurs between 128-512 examples across all the ranks.
+The key takeaway however is how well it supresses the spurious features.
+In the worst case, $rank = 3$ with 4 examples, LoReST suffers from $0.01 \pm 0.00$ spurious features activated.
+Across the full range of hyperparameters the proportion is effectively $0$.
 
-\cref{fig:gpt-pp-target,fig:gpt-pp-unrelated} together demonstrate a clearer picture as to how LoReFT operates.
-Until 16 examples all ranks achieve an average spurious feature activation of $0.0$ across the ranks, this is matched by a maximum target feature activation for $rank = 60$.
-After sufficient examples the spurious feature activation again reaches $0.0$ at 2048, however, this time the maximum target feature activation is $23.3 \pm 40.9$ of $1.8 \pm 1.8$ for $rank = 60$.
-This demonstrates that the adaptor is able to better distinguish between target and spurious concepts with sufficient examples and in turn more precisely manipulate the internal representation.
-
-\smalltitle{LoReST} behaves the best across all chosen ranks.
-Regardless of rank the average spurious feature activation is $0.01$.
-In the case of higher ranks the spurious feature activation is $0.0 \pm 0.0$.
-Unlike LoReFT there low spurious feature activation is consistent across the number of examples.
-However, there is no corresponding increase in the target feature activation as the number of examples increases.
-
-Considering the low target feature activation in \cref{fig:gpt-pp-target} this suggests that LoReST trades the target feature activation in order to keep spurious features low.
-
-\subsubsection{The Issue with Variability}
-\label{sec:variability}
-
-As demonstrated in both \cref{fig:gpt-pp-target} and \cref{fig:gpt-pp-unrelated} there is a large variability across the different adaptors.
-As discussed in the previous sections the largest variance occurs in ACE and is likely due to the environment.
-However, there is still large variance across the other three techniques.
-
-This variance is one of the main drawbacks of steering adaptors being used in practice.
-As \citet{steerability} mention there is a lack of variance reporting in research on steering adaptors which presents a false picture of their success.
-\citet{steerability} find that across the model written evaluation persona dataset \citep{mwe} there is very high variance leading to instance of ``anti-steerability''.
-
-In the case of the results presented in this chapter, there is significant overlap between the highest spurious feature activation and the lowest target feature activation.
-This suggests that in some instances it is possible for spurious concepts to be steered more than target concepts.
-Overall considering the results presented it is not clear that the proposed adaptors are consistent enough to be reliable mechanisms to align model behaviour.
+There are a number of possibilities for why the values are so poor.
+It may be highly discriminant changing a very small proportion of features that are absolutely necessary hence both the target and spurious SAE proportions are very low.
+It may, like LoReFT, require larger ranks or more training examples to properly perform.
+It is unlikely due to the model in this case, unlike ACE there is less reliance on meaningful model representations.
 
 \subsubsection{Semantic Similarity}
 
@@ -253,53 +218,48 @@ Overall considering the results presented it is not clear that the proposed adap
 The final metric discussed in \cref{sec:prompt-pairs} is semantic similarity which is presented in \cref{fig:gpt-pp-sim}.
 As discussed in \cref{sec:prompt-pairs} the semantic similarity is calculated by embedding the target and generated completion using Distilbert \citep{distilbert} and taking the cosine similarity between the two vectors.
 A successful adaptor will have a larger semantic similarity with 1 being a perfect match.
-
 The shaded regions in \cref{fig:gpt-pp-sim} represent one standard deviation across the 5 datasets that were used.
 The same baseline data is used across all 4 plots.
-As with \cref{fig:gpt-pp-target} all adaptors show some level of improvement above the baseline method.
 
 \smalltitle{CAA} continues to present the same behaviour seen in the previous two metrics.
 As the hyperparameter value increases the semantic similarity increases.
 
-The best semantic similarity is achieved by $\lambda = 5$ with $0.66 \pm 0.12$ and in the worst case the adaptor still achieves $0.51 \pm 0.05$ a slight improvement over the baseline at $0.48 \pm 0.05$.
+The best semantic similarity is achieved by $\lambda = 5$ with $0.86 \pm 0.05$ and in the worst case the adaptor still achieves $0.79 \pm 0.07$ a slight improvement over the baseline at $0.77 \pm 0.06$.
 Based on the performance in previous metrics this is the expected result for CAA.
 
-Note that even though $\lambda = 5$ has a larger spurious feature activation in \cref{fig:gpt-pp-unrelated} it still performs better than the other hyperparameters.
+Note that even though $\lambda = 5$ has a larger spurious feature activation in \cref{fig:gpt-caa} it still performs better than the other hyperparameters.
 This demonstrates one drawback of this metric on it's own, a high semantic similarity does not mean that the context of the model has been preserved.
 This idea is explored further in \cref{sec:qual} where the completions are analysed quantitatively.
 
 \smalltitle{ACE} demonstrates the drawbacks of this metric clearly.
-Based on \cref{fig:gpt-pp-unrelated} the expectation is that ACE would perform poorly.
-However, as shown in \cref{fig:gpt-pp-sim} it produces the highest semantic similarity with reasonably small variance.
+Based on \cref{fig:gpt-ace} the expectation is that ACE would perform poorly.
+However, it does produces the highest semantic similarity so it is possible that spurious features do not matter.
 
-The highest semantic similarity the model achieves is $0.69 \pm 0.10$ at 256 examples though all the values from 128 to 2048 examples demonstrate similar performs.
-This is not significantly higher than CAA at $0.66 \pm 0.12$, however this performance is consistent across all hyperparameters.
-In comparison to CAA and the low-rank methods there is a clear increase in similarity as more examples are provided.
-This matches the behaviour seen in \cref{fig:steering-clear} without the clear separation between hyperparameter values.
+The model achieves $0.87 \pm 0.05$, which is not significantly higher than CAA at $0.86 \pm 0.05$, however this performance is consistent across all hyperparameters and example set sizes.
 
 These results may suggest that the effect on spurious correlations are unimportant.
 However, as will be shown in \cref{sec:qual} this is not the case and rather the three metrics alone are insufficient to accurately represent the performance of the adaptors.
 
 \smalltitle{LoReFT} performs very erratically though performs better than the baseline on average.
-There is no clear relationship between the semantic similarity and the SAE feature activations in \cref{fig:gpt-pp-target,fig:gpt-pp-unrelated}.
+There is no clear relationship between the semantic similarity and the SAE feature activations in \cref{fig:gpt-loreft}.
 
-The best performance is achieved when $rank = 5$ with 2048 training examples giving $0.62 \pm 0.12$.
-However this is closely matched by $rank = 20$ at 256 examples with $0.60 \pm 0.07$.
-In the worst case LoReFT achieves $0.48 \pm 0.09$ comparable to the baseline at $0.48 \pm 0.05$ but with more variance.
+The best performance is achieved when $rank = 60$ with 256 training examples giving $0.86 \pm 0.04$ on par with CAA and ACE.
+This similarity is matched by multiple ranks at this number of examples in particular $rank \in \{10, 20, 30, 60\}$.
+In the worst case LoReFT achieves $0.76 \pm 0.08$ comparable to the baseline at $0.77 \pm 0.06$ though slightly worse.
 
 As with the SAE feature activation there is still a large variance in the results.
-Given the range of the output the observed variances account for $\approx 20\%$ of possible values.
+Given the range of the output the observed variances account for ${\footnotesize \sim} 20\%$ of possible values.
 
 \smalltitle{LoReST} appears to perform the worst on average.
-The maximum value achieved is $0.58 \pm 0.06$.
+The maximum similarity achieved is $0.83 \pm 0.04$.
 The analysis is similar to that of LoReFT with consistent improvement though smaller than the affine methods.
 The variance is smaller than that of LoReFT but not significantly so.
 
-Unlike the SAE feature metrics in \cref{fig:gpt-pp-target,fig:gpt-pp-unrelated} there appears to be a slight preference towards larger ranks.
-Across all steering example sets $rank = 60$ achieves an average similarity score of $0.55 \pm 0.0$ in comparison to $rank = 3$ which achieves $0.51 \pm 0.0$.
+Unlike the SAE feature metrics in \cref{fig:gpt-lorest} there appears to be a slight preference towards larger ranks though not significantly so.
+Across all steering example sets $rank = 60$ achieves an average similarity score of $0.80$ in comparison to $rank = 3$ which achieves $0.79$.
 
 Overall the three metrics suggest that CAA performs the best across possible training set sizes.
-Though it suffers from high variance this is as good if not better than the variance of other adaptors.
+Though it suffers from high variance this is as good, if not better, than the variance of other adaptors.
 LoReFT performs comparably but requires tuning hyperparameters and ensuring sufficient training examples are provided.
 
 \subsection{Qualitative Analysis}
@@ -334,7 +294,7 @@ However, with this limitation in mind, it is possible to compare the different a
 Given the low cost of implementing CAA it produces occasionally coherent sentences.
 The output does lack grammatical form but for short word responses CAA would be a viable adaptor.
 
-Recall that as the hyperparameter increased in value \cref{fig:gpt-pp-target,fig:gpt-pp-sim} suggest that CAA improves the completion towards the target concept.
+Recall that as the hyperparameter increased in value \cref{fig:gpt-caa,fig:gpt-pp-sim} suggest that CAA improves the completion towards the target concept.
 This is achieved with minimal spurious SAE feature activation.
 This would suggest that CAA produces coherent sentences that match the target concept.
 
@@ -398,7 +358,7 @@ This goes against what the quantitative results in \cref{sec:quant} suggest, whe
 
 \cref{tab:lorest} presents the selection of completions generated by GPT-2 with LoReST \citep{steering-clear}.
 The analysis in \cref{sec:quant} suggested LoReST was unable to successfully steer the models internal representation or produce sentences that achieved a high semantic similarity score.
-However, the low, near-zero activation values in \cref{fig:gpt-pp-unrelated} suggest that the adaptor maintained the relevant context.
+However, the low, near-zero activation values in \cref{fig:gpt-lorest} suggest that the adaptor maintained the relevant context.
 The low semantic similarity scores suggest that the steered model produced phrases that were not related to the target phrases desired.
 In contrast, \cref{tab:lorest} demonstrates improved performance, qualitatively, against the other adaptors producing sentences which are grammatically sensible and demonstrate accurate steering.
 
