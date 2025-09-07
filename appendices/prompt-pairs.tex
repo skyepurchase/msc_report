@@ -1,2 +1,46 @@
 \chapter{Prompt Pairs Dataset}
 \label{app:prompt-pairs}
+
+The datasets used in this report were created with the aid of GPT-5 \citep{gpt-5}.
+The model was prompted to produce a range of 20 sentences with specific grammatical structures, sentiment, and ending word.
+A range of replacement phrases as well as word synonyms and antonyms where then generated to produce a template system that is capable of generating over 2048 examples.
+
+\begin{table}
+    \centering
+    \captionsetup{width=.9\textwidth}
+    \footnotesize
+    \begin{tabularx}{.9\textwidth}{X}
+        \textbf{Dataset Creation} \\[0.1cm]
+        \dialogue{l}{\prompt{Generate 20 \texttt{[present, past, future, ...]} tense sentence with the suggestion of \texttt{[criminals, agreement, success, ...]} ending with the word \texttt{[gang, agree, win, ...]}}} \\
+        \dialogue{r}{\response{Sure, here are 20 sentences with \texttt{X}: \\
+        - Policy makers often present strategies to improve moral and agree ... \\
+        - ...}} \\
+        \dialogue{l}{\prompt{Generate 20 actions that would replace ``[blank]" in the following sentence ``Policy makers often [blank] to improve moral and agree"}} \\
+        \dialogue{r}{\response{Sure, here are 20 actions that could replace [blank] \\
+        - present strategies \\
+        - estimate budgets \\
+        - ...
+        }} \\
+        \dialogue{l}{\prompt{Generate 5 synonyms and 5 antonyms of "agree"}} \\
+        \dialogue{r}{\response{Sure, here are 5 synonyms of agree \\
+        - consent \\
+        - concur \\
+        - ... \\
+        And here are 5 antonyms \\
+        - disagree \\
+        - oppose \\
+        - ...
+        }} \\
+    \end{tabularx}
+    \caption{A recreation of the prompts and responses used to generate the prompt datasets used in the thesis. The sentences were also prompted to be within the same theme, here the theme is ``corporate".}
+    \label{tab:dataset}
+\end{table}
+
+\cref{tab:dataset} presents an example dialogue used to generate the prompts.
+Frequently the sentences included words after the requested last word or did not make grammatical sense, these had to be regenerated.
+Furthermore, to prevent the model getting stuck in a pattern a new model instance was created for each dataset.
+
+When generating full training examples a template, action, and synonym/antonym pair are selected, together these form a coherent sentence where the difference is in the last word.
+The model is then steered away from the antonym towards the synonym.
+
+With 20 templates, 20 actions, 5 synonyms, 5 antonyms in theory 10,000 examples can be created but these would have a lot of commonalities so only a 3000 are generated from template, action and synonyms with a random antonym chosen each time.
