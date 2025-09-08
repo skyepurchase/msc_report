@@ -4,7 +4,6 @@
 \usepackage[pdfborder={0 0 0},backref=page]{hyperref}
 \usepackage{dissertation}
 \usepackage{lineno}
-\linespread{1.5}
 
 \hypersetup{
     colorlinks=true,
@@ -19,7 +18,7 @@
 {{\Huge Does Size Matter?}\\{\Large The Effect of Sample Size on Steering}}\\
 }
 \date{Submission date: 8 September 2025}
-\author{PRHC8\thanks{
+\author{Skye Purchase\thanks{
 {\bf Disclaimer:}
 This report is submitted as part requirement for the Machine Learning MSc at UCL. It is
 substantially the result of my own work except where explicitly indicated in the text.
@@ -32,11 +31,9 @@ Daniel Tan \& Brooks Paige}
 
 %TC:ignore
 \include{math_commands}
-\include{metadata}
 
 \pagenumbering{roman}
 
-\onehalfspacing
 \maketitle
 
 \chapter*{Acknowledgements}
@@ -60,8 +57,6 @@ Additionally, to Alex for providing detailed, actionable feedback on my early ro
 \end{abstract}
 
 \tableofcontents
-\listoffigures
-\listoftables
 \clearpage
 \pagenumbering{arabic}
 %TC:endignore
@@ -81,7 +76,6 @@ Additionally, to Alex for providing detailed, actionable feedback on my early ro
 \include{appendices/ace}
 \include{appendices/prompt-pairs}
 \include{appendices/steering-clear}
-\include{appendices/hyperparameters}
 %TC:endignore
 
 \end{document}
